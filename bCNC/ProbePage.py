@@ -28,6 +28,7 @@ import Ribbon
 import tkExtra
 import CNCRibbon
 import time
+import threading
 
 PROBE_CMD = [	_("G38.2 stop on contact else error"),
 		_("G38.3 stop on contact"),
@@ -68,7 +69,6 @@ CAMERA_LOCATION_ORDER = [
 		    "Bottom-Left",
 		    "Bottom",
 		    "Bottom-Right"]
-
 
 #===============================================================================
 # Probe Tab Group
@@ -2256,7 +2256,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 		col += 1
 		self.zProbeZ = tkExtra.FloatEntry(lframe, background="White", width=5)
 		self.zProbeZ.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.zProbeZ, _("Auto tool change Z-Probing MZ location"))
+		tkExtra.Balloon.set(self.zProbeZ, _("Auto tool change Z-Probing depth"))
 		self.addWidget(self.zProbeZ)
 		self.zProbeZ.bind('<KeyRelease>', self.setATCParams)
 		self.zProbeZ.bind('<FocusOut>', self.setATCParams)
@@ -2278,11 +2278,30 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.addWidget(b)
 
 		self.toolRackStatus = BooleanVar()
+		self.btn_text = StringVar()
+		self.btn_text.set("Enable Tool Rack")
 
 		row += 1
 		col = 0
-		b = Checkbutton(lframe,
-				text = 'Enable Tool Rack',
+		b = Button(lframe, text=_("Open Air Pump"),
+				   command=self.openAirPump,
+				   padx=2, pady=1, width = 4)
+		b.grid(row=row, column=col, sticky=EW, columnspan=3)
+		tkExtra.Balloon.set(b, _("Open Air Pump"))
+		self.addWidget(b)
+
+		col += 3
+		b = Button(lframe, text=_("Close Air Pump"),
+				   command=self.closeAirPump,
+				   padx=2, pady=1, width = 4)
+		b.grid(row=row, column=col, sticky=EW, columnspan=4)
+		tkExtra.Balloon.set(b, _("Open Air Pump"))
+		self.addWidget(b)
+
+		row += 1
+		col = 0
+		self.toolrackButton = Checkbutton(lframe,
+				textvariable=self.btn_text,
 				image=Utils.icons["spinningtop"],
 				command=self.controlToolRack,
 				compound=LEFT,
@@ -2290,9 +2309,9 @@ class ATCFrame(CNCRibbon.PageFrame):
 				variable=self.toolRackStatus,
 				padx=1,
 				pady=0)
-		b.grid(row=row, column=col, columnspan=7, sticky=EW)
-		tkExtra.Balloon.set(b, _("Enable or Disable tool rack"))
-		self.addWidget(b)
+		self.toolrackButton.grid(row=row, column=col, columnspan=7, sticky=EW)
+		tkExtra.Balloon.set(self.toolrackButton, _("Enable or Disable tool rack"))
+		self.addWidget(self.toolrackButton)
 
 		lframe.grid_columnconfigure(1, weight=1)
 		lframe.grid_columnconfigure(2, weight=1)
@@ -2305,14 +2324,16 @@ class ATCFrame(CNCRibbon.PageFrame):
 	def controlToolRack(self):
 		if self.toolRackStatus.get():
 			# enable tool rack
-			self.toolrack.enable()
+			self.toolrack.enableToolRack()
 			time.sleep(1)
 			self.app.home()
+			self.btn_text.set("Disable Tool Rack")
 		else:
 			# disable tool rack
-			self.toolrack.disable()
+			self.toolrack.disableToolRack()
 			time.sleep(1)
 			self.app.home()
+			self.btn_text.set("Enable Tool Rack")
 
 	# -----------------------------------------------------------------------
 	def saveConfig(self):
@@ -2320,25 +2341,21 @@ class ATCFrame(CNCRibbon.PageFrame):
 		Utils.setFloat("ATC", "tool1y", self.tool1Y.get())
 		Utils.setFloat("ATC", "tool1z", self.tool1Z.get())
 
-		Utils.setFloat("ATC", "tool1x", self.tool1X.get())
-		Utils.setFloat("ATC", "tool1y", self.tool1Y.get())
-		Utils.setFloat("ATC", "tool1z", self.tool1Z.get())
+		Utils.setFloat("ATC", "tool2x", self.tool2X.get())
+		Utils.setFloat("ATC", "tool2y", self.tool2Y.get())
+		Utils.setFloat("ATC", "tool2z", self.tool2Z.get())
 
-		Utils.setFloat("ATC", "tool2x", self.tool1X.get())
-		Utils.setFloat("ATC", "tool2y", self.tool1Y.get())
-		Utils.setFloat("ATC", "tool2z", self.tool1Z.get())
+		Utils.setFloat("ATC", "tool3x", self.tool3X.get())
+		Utils.setFloat("ATC", "tool3y", self.tool3Y.get())
+		Utils.setFloat("ATC", "tool3z", self.tool3Z.get())
 
-		Utils.setFloat("ATC", "tool3x", self.tool1X.get())
-		Utils.setFloat("ATC", "tool3y", self.tool1Y.get())
-		Utils.setFloat("ATC", "tool3z", self.tool1Z.get())
+		Utils.setFloat("ATC", "tool4x", self.tool4X.get())
+		Utils.setFloat("ATC", "tool4y", self.tool4Y.get())
+		Utils.setFloat("ATC", "tool4z", self.tool4Z.get())
 
-		Utils.setFloat("ATC", "tool4x", self.tool1X.get())
-		Utils.setFloat("ATC", "tool4y", self.tool1Y.get())
-		Utils.setFloat("ATC", "tool4z", self.tool1Z.get())
-
-		Utils.setFloat("ATC", "tool5x", self.tool1X.get())
-		Utils.setFloat("ATC", "tool5y", self.tool1Y.get())
-		Utils.setFloat("ATC", "tool5z", self.tool1Z.get())
+		Utils.setFloat("ATC", "tool5x", self.tool5X.get())
+		Utils.setFloat("ATC", "tool5y", self.tool5Y.get())
+		Utils.setFloat("ATC", "tool5z", self.tool5Z.get())
 
 		Utils.setFloat("ATC", "zprobex", self.zProbeX.get())
 		Utils.setFloat("ATC", "zprobey", self.zProbeY.get())
@@ -2523,26 +2540,20 @@ class ATCFrame(CNCRibbon.PageFrame):
 	def calibrate(self, event=None):
 		self.set()
 		if self.check4Errors(): return
-		# release clamp
-		self.toolrack.release()
 		# move grantry to tool1 position
 		lines = []
 		lines.append("g53 g0 z-2")
 		lines.append("g53 g0 x[zprobex] y[zprobey]")
+		lines.append("g4 p1")  # wait a sec
+
 		lines.append("%wait")
-		lines.append("g53 g38.2 z[zprobez] f[prbfeed]")
+		lines.append("g91 g38.2 z[zprobez] f[prbfeed]")
 		lines.append("g4 p1")	# wait a sec
 
 		lines.append("%global TLO; TLO=toolmz-mz")
 		lines.append("g43.1z[TLO]")
 		lines.append("%update TLO")
 
-		lines.append("g90")
-		self.app.run(lines=lines)
-
-		# move z axis up
-		lines = []
-		lines.append("%wait")
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g53 g0 z-2")
 		lines.append("g90")
@@ -2552,15 +2563,13 @@ class ATCFrame(CNCRibbon.PageFrame):
 	def homeZ(self):
 		# home machine
 		self.app.home()
-		# home tool rack
-		self.toolrack.home()
 
 	# -----------------------------------------------------------------------
 	def tool1On(self):
 		self.set()
 		if self.check4Errors(): return
 		# release clamp
-		self.toolrack.release()
+		self.toolrack.openAirPump()
 		# move grantry to tool1 position
 		lines = []
 		lines.append("g53 g0 z-2")
@@ -2570,15 +2579,24 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g90")
 		self.app.run(lines=lines)
-		# clamp the bit
-		self.toolrack.clamp();
-		# move z axis up
-		lines = []
-		lines.append("%wait")
-		lines.append("g4 p1")	# wait a sec
-		lines.append("g53 g0 z-2")
-		lines.append("g90")
-		self.app.run(lines=lines)
+		# wait and run second command
+		self.tool1OnStep2()
+
+	# -----------------------------------------------------------------------
+	def tool1OnStep2(self):
+		if self.app.running:
+			self.after(1000, self.tool1OnStep2)
+		else:
+			print('running tool1OnStep1 done...')
+			# clamp the bit
+			self.toolrack.closeAirPump()
+			# move z axis up
+			lines = []
+			lines.append("%wait")
+			lines.append("g4 p1")  # wait a sec
+			lines.append("g53 g0 z-2")
+			lines.append("g90")
+			self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
 	def tool1Off(self):
@@ -2593,15 +2611,34 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g90")
 		self.app.run(lines=lines)
-		# release the clamp
-		self.toolrack.release();
-		# move z axis up
-		lines = []
-		lines.append("%wait")
-		lines.append("g4 p1")	# wait a sec
-		lines.append("g53 g0 z-2")
-		lines.append("g90")
-		self.app.run(lines=lines)
+		# wait and run second command
+		self.tool1OffStep2()
+
+	# -----------------------------------------------------------------------
+	def tool1OffStep2(self):
+		if self.app.running:
+			self.after(1000, self.tool1OffStep2)
+		else:
+			print('running tool1Offstep1 done...')
+			# release the clamp
+			self.toolrack.openAirPump()
+			# move z axis up
+			lines = []
+			lines.append("%wait")
+			lines.append("g4 p1")	# wait a sec
+			lines.append("g53 g0 z-2")
+			lines.append("g90")
+			self.app.run(lines=lines)
+			# wait and run 3rd command
+			self.too1OffStep3()
+
+	# -----------------------------------------------------------------------
+	def tool1OffStep3(self):
+		if self.app.running:
+			self.after(1000, self.tool1OffStep3)
+		else:
+			rint('running tool1OffStep2 done...')
+			self.toolrack.closeAirPump()
 
 	# -----------------------------------------------------------------------
 	def tool2On(self):
@@ -2639,6 +2676,14 @@ class ATCFrame(CNCRibbon.PageFrame):
 	def tool5Off(self):
 		return
 
+
+	# -----------------------------------------------------------------------
+	def openAirPump(self):
+		self.toolrack.openAirPump()
+
+	# -----------------------------------------------------------------------
+	def closeAirPump(self):
+		self.toolrack.closeAirPump()
 
 
 ##===============================================================================
