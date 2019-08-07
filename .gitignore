@@ -2,6 +2,7 @@
 *.pyo
 lib/*.pyc
 lib/*.pyo
+venv/*
 .idea
 bCNC.egg-info
 .eggs
