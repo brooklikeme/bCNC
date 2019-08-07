@@ -202,6 +202,7 @@ class Application(Toplevel,Sender):
 			for n in Utils.getStr(Utils.__prg__,"%s.ribbon"%(page.name)).split():
 				try:
 					page.addRibbonGroup(n)
+					pass
 				except KeyError:
 					errors.append(n)
 
@@ -230,6 +231,8 @@ class Application(Toplevel,Sender):
 		self.terminal = Page.frames["Terminal"].terminal
 		self.buffer   = Page.frames["Terminal"].buffer
 
+		self.topdro = Page._topdroframe
+
 		# XXX FIXME Do we need it or I can takes from Page every time?
 		self.autolevel = Page.frames["Probe:Autolevel"]
 
@@ -238,7 +241,7 @@ class Application(Toplevel,Sender):
 			last = name[-1]
 			if last == '>':
 				name = name[:-1]
-				side = RIGHT
+				side = LEFT
 			else:
 				side = LEFT
 			self.ribbon.addPage(self.pages[name],side)
@@ -2147,7 +2150,7 @@ class Application(Toplevel,Sender):
 						activebackground="Salmon")
 		else:
 			serialPage = Page.frames["Serial"]
-			device	 = _device or serialPage.portCombo.get() #.split("\t")[0]
+			device	 = _device or serialPage.selectedPort.get() #.split("\t")[0]
 			baudrate = _baud   or serialPage.baudCombo.get()
 			if self.open(device, baudrate):
 				serialPage.connectBtn.config(text=_("Close"),
@@ -2171,7 +2174,8 @@ class Application(Toplevel,Sender):
 	def close(self):
 		Sender.close(self)
 		try:
-			self.dro.updateState()
+			#self.dro.updateState()
+			self.topdro.updateState()
 		except TclError:
 			pass
 
@@ -2426,8 +2430,10 @@ class Application(Toplevel,Sender):
 				else:
 					CNC.vars["color"] = STATECOLORDEF
 			self._pause = ("Hold" in state)
-			self.dro.updateState()
-			self.dro.updateCoords()
+			#self.dro.updateState()
+			#self.dro.updateCoords()
+			self.topdro.updateState()
+			self.topdro.updateCoords()
 			self.canvas.gantry(CNC.vars["wx"],
 					   CNC.vars["wy"],
 					   CNC.vars["wz"],

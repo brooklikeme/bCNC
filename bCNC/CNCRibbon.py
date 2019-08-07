@@ -135,6 +135,13 @@ class Page(Ribbon.Page):
 				Page.frames[w.name] = w
 
 	#----------------------------------------------------------------------
+	# Register topdro frome
+	#----------------------------------------------------------------------
+	def _registerTopDroFrame(self, topdroframe):
+		w = topdroframe(self.master._topdroFrame, self.app)
+		Page._topdroframe = w
+
+	#----------------------------------------------------------------------
 	# Add a widget in the widgets list to enable disable during the run
 	#----------------------------------------------------------------------
 	def addWidget(self, widget):

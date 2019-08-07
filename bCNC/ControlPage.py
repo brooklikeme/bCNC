@@ -471,6 +471,159 @@ class DROFrame(CNCRibbon.PageFrame):
 				_("No info available.\nPlease contact the author."))
 		tkMessageBox.showinfo(_("State: %s")%(state), msg, parent=self)
 
+#===============================================================================
+# TOP DRO Frame
+#===============================================================================
+class TopDROFrame(Frame, CNCRibbon._LinkApp):
+	dro_status = ('Helvetica',12,'bold')
+	dro_wpos   = ('Helvetica',12,'bold')
+	dro_mpos   = ('Helvetica',12)
+
+	def __init__(self, master, app, **kw):
+		Frame.__init__(self, master, kw)
+		CNCRibbon._LinkApp.__init__(self, app)
+
+		TopDROFrame.dro_status = Utils.getFont("dro.status", TopDROFrame.dro_status)
+		TopDROFrame.dro_wpos   = Utils.getFont("dro.wpos",   TopDROFrame.dro_wpos)
+		TopDROFrame.dro_mpos   = Utils.getFont("dro.mpos",   TopDROFrame.dro_mpos)
+
+		row = 0
+		col = 0
+		Label(self,text=_("Status:")).grid(row=row,column=col,sticky=E)
+		col += 1
+		self.state = Button(self,
+				text=Sender.NOT_CONNECTED,
+				font=TopDROFrame.dro_status,
+				command=self.showState,
+				cursor="hand1",
+				background=Sender.STATECOLOR[Sender.NOT_CONNECTED],
+				activebackground="LightYellow")
+		self.state.grid(row=row,column=col, columnspan=3, sticky=EW)
+		tkExtra.Balloon.set(self.state,
+				_("Show current state of the machine\n"
+				  "Click to see details\n"
+				  "Right-Click to clear alarm/errors"))
+		#self.state.bind("<Button-3>", lambda e,s=self : s.event_generate("<<AlarmClear>>"))
+		self.state.bind("<Button-3>", self.stateMenu)
+
+		row += 1
+		col = 0
+		Label(self,text=_("WPos:")).grid(row=row,column=col,sticky=E)
+
+		# work
+		col += 1
+		self.xwork = Entry(self, font=TopDROFrame.dro_wpos,
+					background="White",
+					relief=FLAT,
+					borderwidth=0,
+					justify=RIGHT)
+		self.xwork.grid(row=row,column=col,padx=1,sticky=EW)
+		tkExtra.Balloon.set(self.xwork, _("X work position (click to set)"))
+
+		# ---
+		col += 1
+		self.ywork = Entry(self, font=TopDROFrame.dro_wpos,
+					background="White",
+					relief=FLAT,
+					borderwidth=0,
+					justify=RIGHT)
+		self.ywork.grid(row=row,column=col,padx=1,sticky=EW)
+		tkExtra.Balloon.set(self.ywork, _("Y work position (click to set)"))
+
+		# ---
+		col += 1
+		self.zwork = Entry(self, font=TopDROFrame.dro_wpos,
+					background="White",
+					relief=FLAT,
+					borderwidth=0,
+					justify=RIGHT)
+		self.zwork.grid(row=row,column=col,padx=1,sticky=EW)
+		tkExtra.Balloon.set(self.zwork, _("Z work position (click to set)"))
+
+		# Machine
+		row += 1
+		col = 0
+		Label(self,text=_("MPos:")).grid(row=row,column=col,sticky=E)
+
+		col += 1
+		self.xmachine = Label(self, font=TopDROFrame.dro_mpos, background="White",anchor=E)
+		self.xmachine.grid(row=row,column=col,padx=1,sticky=EW)
+
+		col += 1
+		self.ymachine = Label(self, font=TopDROFrame.dro_mpos, background="White",anchor=E)
+		self.ymachine.grid(row=row,column=col,padx=1,sticky=EW)
+
+		col += 1
+		self.zmachine = Label(self, font=TopDROFrame.dro_mpos, background="White", anchor=E)
+		self.zmachine.grid(row=row,column=col,padx=1,sticky=EW)
+
+		self.grid_columnconfigure(1, weight=1)
+		self.grid_columnconfigure(2, weight=1)
+		self.grid_columnconfigure(3, weight=1)
+
+	#----------------------------------------------------------------------
+	def stateMenu(self, event=None):
+		menu = Menu(self, tearoff=0)
+
+		menu.add_command(label=_("Show Info"), image=Utils.icons["info"], compound=LEFT,
+					command=self.showState)
+		menu.add_command(label=_("Clear Message"), image=Utils.icons["clear"], compound=LEFT,
+					command=lambda s=self: s.event_generate("<<AlarmClear>>"))
+		menu.add_separator()
+
+		menu.add_command(label=_("Feed hold"), image=Utils.icons["pause"], compound=LEFT,
+					command=lambda s=self: s.event_generate("<<FeedHold>>"))
+		menu.add_command(label=_("Resume"), image=Utils.icons["start"], compound=LEFT,
+					command=lambda s=self: s.event_generate("<<Resume>>"))
+
+		menu.tk_popup(event.x_root, event.y_root)
+
+	#----------------------------------------------------------------------
+	def updateState(self):
+		msg = self.app._msg or CNC.vars["state"]
+		if CNC.vars["pins"] is not None and CNC.vars["pins"] != "":
+			msg += " ["+CNC.vars["pins"]+"]"
+		self.state.config(text=msg, background=CNC.vars["color"])
+
+	#----------------------------------------------------------------------
+	def updateCoords(self):
+		try:
+			focus = self.focus_get()
+		except:
+			focus = None
+		if focus is not self.xwork:
+			self.xwork.delete(0,END)
+			self.xwork.insert(0,self.padFloat(CNC.drozeropad,CNC.vars["wx"]))
+		if focus is not self.ywork:
+			self.ywork.delete(0,END)
+			self.ywork.insert(0,self.padFloat(CNC.drozeropad,CNC.vars["wy"]))
+		if focus is not self.zwork:
+			self.zwork.delete(0,END)
+			self.zwork.insert(0,self.padFloat(CNC.drozeropad,CNC.vars["wz"]))
+
+		self.xmachine["text"] = self.padFloat(CNC.drozeropad,CNC.vars["mx"])
+		self.ymachine["text"] = self.padFloat(CNC.drozeropad,CNC.vars["my"])
+		self.zmachine["text"] = self.padFloat(CNC.drozeropad,CNC.vars["mz"])
+
+	#----------------------------------------------------------------------
+	def padFloat(self, decimals, value):
+		if decimals>0:
+			return "%0.*f"%(decimals, value)
+		else:
+			return value
+
+	#----------------------------------------------------------------------
+	def showState(self):
+		err = CNC.vars["errline"]
+		if err:
+			msg  = _("Last error: %s\n")%(CNC.vars["errline"])
+		else:
+			msg = ""
+
+		state = CNC.vars["state"]
+		msg += ERROR_CODES.get(state,
+				_("No info available.\nPlease contact the author."))
+		tkMessageBox.showinfo(_("State: %s")%(state), msg, parent=self)
 
 #===============================================================================
 # ControlFrame
@@ -482,31 +635,14 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		frame = Frame(self())
 		frame.pack(side=TOP, fill=X)
 
+		height=40
 		row,col = 0,0
-		Label(frame, text=_("Z")).grid(row=row, column=col)
 
-		col += 3
-		Label(frame, text=_("Y")).grid(row=row, column=col)
-
-		# ---
-		row += 1
-		col = 0
-
-		width=3
-		height=2
-
-		b = Button(frame, text=Unicode.BLACK_UP_POINTING_TRIANGLE,
-					command=self.moveZup,
-					width=width, height=height,
-					activebackground="LightYellow")
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move +Z"))
-		self.addWidget(b)
-
-		col += 2
 		b = Button(frame, text=Unicode.UPPER_LEFT_TRIANGLE,
 					command=self.moveXdownYup,
-					width=width, height=height,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
 					activebackground="LightYellow")
 
 		b.grid(row=row, column=col, sticky=EW)
@@ -514,9 +650,11 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		self.addWidget(b)
 
 		col += 1
-		b = Button(frame, text=Unicode.BLACK_UP_POINTING_TRIANGLE,
+		b = Button(frame, text="Y+",
 					command=self.moveYup,
-					width=width, height=height,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move +Y"))
@@ -525,88 +663,102 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		col += 1
 		b = Button(frame, text=Unicode.UPPER_RIGHT_TRIANGLE,
 					command=self.moveXupYup,
-					width=width, height=height,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move +X +Y"))
 		self.addWidget(b)
 
-		col += 2
-		b = Button(frame, text=u"\u00D710",
-				command=self.mulStep,
-				width=3,
-				padx=1, pady=1)
-		b.grid(row=row, column=col, sticky=EW+S)
-		tkExtra.Balloon.set(b, _("Multiply step by 10"))
-		self.addWidget(b)
+		col += 1
+		b = Label(frame, image=Utils.icons["sep"],
+				    height=height,
+				    compound="c",)
+		b.grid(row=row, column=col, sticky=EW)
 
 		col += 1
-		b = Button(frame, text=_("+"),
-				command=self.incStep,
-				width=3,
-				padx=1, pady=1)
-		b.grid(row=row, column=col, sticky=EW+S)
-		tkExtra.Balloon.set(b, _("Increase step by 1 unit"))
+		b = Button(frame, text="Z+",
+					command=self.moveZup,
+				    image=Utils.icons["empty"],
+					height=height,
+				    compound="c",
+					activebackground="LightYellow")
+		b.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(b, _("Move +Z"))
 		self.addWidget(b)
 
-		# ---
+		# ---------------------------------------------
 		row += 1
 
-		col = 1
-		Label(frame, text=_("X"), width=3, anchor=E).grid(row=row, column=col, sticky=E)
-
-		col += 1
-		b = Button(frame, text=Unicode.BLACK_LEFT_POINTING_TRIANGLE,
+		col = 0
+		b = Button(frame, text="X-",
 					command=self.moveXdown,
-					width=width, height=height,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move -X"))
 		self.addWidget(b)
 
 		col += 1
-		b = Utils.UserButton(frame, self.app, 0, text=Unicode.LARGE_CIRCLE,
-					command=self.go2origin,
-					width=width, height=height,
-					activebackground="LightYellow")
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to Origin.\nUser configurable button.\nRight click to configure."))
-		self.addWidget(b)
+		self.selectedStep = StringVar()
+		self.selectedStep.set(Utils.config.get("Control", "step"))
+		self.step = OptionMenu(frame, self.selectedStep, *(Utils.config.get("Control", "steplist").split()))
+		self.step.config(padx=0, pady=1, width=5)
+		self.step.grid(row=row, column=col, columnspan=1, sticky=EW)
+		tkExtra.Balloon.set(self.step, _("Step for X and Y move operation"))
+		self.addWidget(self.step)
 
 		col += 1
-		b = Button(frame, text=Unicode.BLACK_RIGHT_POINTING_TRIANGLE,
+		b = Button(frame, text="X+",
 					command=self.moveXup,
-					width=width, height=height,
-					activebackground="LightYellow")
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
+				 	activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move +X"))
 		self.addWidget(b)
 
-		# --
-		col += 1
-		Label(frame,"",width=2).grid(row=row,column=col)
 
 		col += 1
-		self.step = tkExtra.Combobox(frame, width=6, background="White")
-		self.step.grid(row=row, column=col, columnspan=2, sticky=EW)
-		self.step.set(Utils.config.get("Control","step"))
-		self.step.fill(map(float, Utils.config.get("Control","steplist").split()))
-		tkExtra.Balloon.set(self.step, _("Step for every move operation"))
-		self.addWidget(self.step)
+		b = Label(frame, image=Utils.icons["sep"],
+				    height=height,
+				    compound="c",)
+		b.grid(row=row, column=col, sticky=EW)
+
+		col += 1
+		self.selectedZStep = StringVar()
+		self.selectedZStep.set(Utils.config.get("Control", "zstep"))
+		self.zstep = OptionMenu(frame, self.selectedZStep, *(Utils.config.get("Control", "zsteplist").split()))
+		self.zstep.config(padx=0, pady=1, width=5)
+		self.zstep.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.zstep, _("Step for Z move operation"))
+		self.addWidget(self.zstep)
+
+
+		# self.step = tkExtra.Combobox(frame, width=6, background="White")
+		# self.step.grid(row=row, column=col, columnspan=2, sticky=EW)
+		# self.step.set(Utils.config.get("Control","step"))
+		# self.step.fill(map(float, Utils.config.get("Control","steplist").split()))
+		# tkExtra.Balloon.set(self.step, _("Step for every move operation"))
+		# self.addWidget(self.step)
 
 		# -- Separate zstep --
-		try:
-			zstep = Utils.config.get("Control","zstep")
-			self.zstep = tkExtra.Combobox(frame, width=4, background="White")
-			self.zstep.grid(row=row, column=0, columnspan=1, sticky=EW)
-			self.zstep.set(zstep)
-			zsl = [_NOZSTEP]
-			zsl.extend(map(float, Utils.config.get("Control","zsteplist").split()))
-			self.zstep.fill(zsl)
-			tkExtra.Balloon.set(self.zstep, _("Step for Z move operation"))
-			self.addWidget(self.zstep)
-		except:
-			self.zstep = self.step
+		# try:
+		# 	zstep = Utils.config.get("Control","zstep")
+		# 	self.zstep = tkExtra.Combobox(frame, width=4, background="White")
+		# 	self.zstep.grid(row=row, column=0, columnspan=1, sticky=EW)
+		# 	self.zstep.set(zstep)
+		# 	zsl = [_NOZSTEP]
+		# 	zsl.extend(map(float, Utils.config.get("Control","zsteplist").split()))
+		# 	self.zstep.fill(zsl)
+		# 	tkExtra.Balloon.set(self.zstep, _("Step for Z move operation"))
+		# 	self.addWidget(self.zstep)
+		# except:
+		# 	self.zstep = self.step
 
 		# Default steppings
 		try:
@@ -624,31 +776,25 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		except:
 			self.step3 = 10
 
-		# ---
+		# -------------------------------------------------
 		row += 1
 		col = 0
-
-		b = Button(frame, text=Unicode.BLACK_DOWN_POINTING_TRIANGLE,
-					command=self.moveZdown,
-					width=width, height=height,
-					activebackground="LightYellow")
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move -Z"))
-		self.addWidget(b)
-
-		col += 2
 		b = Button(frame, text=Unicode.LOWER_LEFT_TRIANGLE,
 					command=self.moveXdownYdown,
-					width=width, height=height,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move -X -Y"))
 		self.addWidget(b)
 
 		col += 1
-		b = Button(frame, text=Unicode.BLACK_DOWN_POINTING_TRIANGLE,
+		b = Button(frame, text="Y-",
 					command=self.moveYdown,
-					width=width, height=height,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move -Y"))
@@ -657,27 +803,37 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		col += 1
 		b = Button(frame, text=Unicode.LOWER_RIGHT_TRIANGLE,
 					command=self.moveXupYdown,
-					width=width, height=height,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move +X -Y"))
 		self.addWidget(b)
 
-		col += 2
-		b = Button(frame, text=u"\u00F710",
-					command=self.divStep,
-					padx=1, pady=1)
-		b.grid(row=row, column=col, sticky=EW+N)
-		tkExtra.Balloon.set(b, _("Divide step by 10"))
-		self.addWidget(b)
+		col += 1
+		b = Label(frame, image=Utils.icons["sep"],
+				    height=height,
+				    compound="c",)
+		b.grid(row=row, column=col, sticky=EW)
 
 		col += 1
-		b = Button(frame, text=_("-"),
-					command=self.decStep,
-					padx=1, pady=1)
-		b.grid(row=row, column=col, sticky=EW+N)
-		tkExtra.Balloon.set(b, _("Decrease step by 1 unit"))
+		b = Button(frame, text="Z-",
+					command=self.moveZdown,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
+					activebackground="LightYellow")
+		b.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(b, _("Move -Z"))
 		self.addWidget(b)
+
+		frame.grid_columnconfigure(0, weight=1)
+		frame.grid_columnconfigure(1, weight=1)
+		frame.grid_columnconfigure(2, weight=1)
+		frame.grid_columnconfigure(3, weight=1)
+		frame.grid_columnconfigure(4, weight=1)
+
 
 		#self.grid_columnconfigure(6,weight=1)
 		try:
@@ -688,54 +844,54 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 
 	#----------------------------------------------------------------------
 	def saveConfig(self):
-		Utils.setFloat("Control", "step", self.step.get())
+		Utils.setFloat("Control", "step", self.selectedStep.get())
 		if self.zstep is not self.step:
-			Utils.setFloat("Control", "zstep", self.zstep.get())
+			Utils.setFloat("Control", "zstep", self.selectedZStep.get())
 
 	#----------------------------------------------------------------------
 	# Jogging
 	#----------------------------------------------------------------------
 	def getStep(self, axis='x'):
 		if axis == 'z':
-			zs = self.zstep.get()
+			zs = self.selectedZStep.get()
 			if zs == _NOZSTEP:
-				return self.step.get()
+				return self.selectedStep.get()
 			else:
 				return zs
 		else:
-			return self.step.get()
+			return self.selectedStep.get()
 
 	def moveXup(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("X%s"%(self.step.get()))
+		self.app.mcontrol.jog("X%s"%(self.selectedStep.get()))
 
 	def moveXdown(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("X-%s"%(self.step.get()))
+		self.app.mcontrol.jog("X-%s"%(self.selectedStep.get()))
 
 	def moveYup(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("Y%s"%(self.step.get()))
+		self.app.mcontrol.jog("Y%s"%(self.selectedStep.get()))
 
 	def moveYdown(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("Y-%s"%(self.step.get()))
+		self.app.mcontrol.jog("Y-%s"%(self.selectedStep.get()))
 
 	def moveXdownYup(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("X-%sY%s"%(self.step.get(),self.step.get()))
+		self.app.mcontrol.jog("X-%sY%s"%(self.selectedStep.get(),self.selectedStep.get()))
 
 	def moveXupYup(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("X%sY%s"%(self.step.get(),self.step.get()))
+		self.app.mcontrol.jog("X%sY%s"%(self.selectedStep.get(),self.selectedStep.get()))
 
 	def moveXdownYdown(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("X-%sY-%s"%(self.step.get(),self.step.get()))
+		self.app.mcontrol.jog("X-%sY-%s"%(self.selectedStep.get(),self.selectedStep.get()))
 
 	def moveXupYdown(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		self.app.mcontrol.jog("X%sY-%s"%(self.step.get(),self.step.get()))
+		self.app.mcontrol.jog("X%sY-%s"%(self.selectedStep.get(),self.selectedStep.get()))
 
 	def moveZup(self, event=None):
 		if event is not None and not self.acceptKey(): return
@@ -753,13 +909,13 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 
 	#----------------------------------------------------------------------
 	def setStep(self, s, zs=None):
-		self.step.set("%.4g"%(s))
+		self.selectedStep.set("%.4g"%(s))
 		if self.zstep is self.step or zs is None:
 			self.event_generate("<<Status>>",
 				data=_("Step: %g")%(s))
 				#data=(_("Step: %g")%(s)).encode("utf8"))
 		else:
-			self.zstep.set("%.4g"%(zs))
+			self.selectedZStep.set("%.4g"%(zs))
 			self.event_generate("<<Status>>",
 				data=_("Step: %g    Zstep:%g ")%(s,zs))
 				#data=(_("Step: %g    Zstep:%g ")%(s,zs)).encode("utf8"))
@@ -778,12 +934,12 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 	#----------------------------------------------------------------------
 	def incStep(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		step, power = ControlFrame._stepPower(self.step.get())
+		step, power = ControlFrame._stepPower(self.selectedStep.get())
 		s = step+power
 		if s<_LOWSTEP: s = _LOWSTEP
 		elif s>_HIGHSTEP: s = _HIGHSTEP
-		if self.zstep is not self.step and self.zstep.get() != _NOZSTEP:
-			step, power = ControlFrame._stepPower(self.zstep.get())
+		if self.zstep is not self.step and self.selectedZStep.get() != _NOZSTEP:
+			step, power = ControlFrame._stepPower(self.selectedZStep.get())
 			zs = step+power
 			if zs<_LOWSTEP: zs = _LOWSTEP
 			elif zs>_HIGHZSTEP: zs = _HIGHZSTEP
@@ -794,13 +950,13 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 	#----------------------------------------------------------------------
 	def decStep(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		step, power = ControlFrame._stepPower(self.step.get())
+		step, power = ControlFrame._stepPower(self.selectedStep.get())
 		s = step-power
 		if s<=0.0: s = step-power/10.0
 		if s<_LOWSTEP: s = _LOWSTEP
 		elif s>_HIGHSTEP: s = _HIGHSTEP
-		if self.zstep is not self.step and self.zstep.get() != _NOZSTEP:
-			step, power = ControlFrame._stepPower(self.zstep.get())
+		if self.zstep is not self.step and self.selectedZStep.get() != _NOZSTEP:
+			step, power = ControlFrame._stepPower(self.selectedZStep.get())
 			zs = step-power
 			if zs<=0.0: zs = step-power/10.0
 			if zs<_LOWSTEP: zs = _LOWSTEP
@@ -812,12 +968,12 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 	#----------------------------------------------------------------------
 	def mulStep(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		step, power = ControlFrame._stepPower(self.step.get())
+		step, power = ControlFrame._stepPower(self.selectedStep.get())
 		s = step*10.0
 		if s<_LOWSTEP: s = _LOWSTEP
 		elif s>_HIGHSTEP: s = _HIGHSTEP
-		if self.zstep is not self.step and self.zstep.get() != _NOZSTEP:
-			step, power = ControlFrame._stepPower(self.zstep.get())
+		if self.zstep is not self.step and self.selectedZStep.get() != _NOZSTEP:
+			step, power = ControlFrame._stepPower(self.selectedZStep.get())
 			zs = step*10.0
 			if zs<_LOWSTEP: zs = _LOWSTEP
 			elif zs>_HIGHZSTEP: zs = _HIGHZSTEP
@@ -828,12 +984,12 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 	#----------------------------------------------------------------------
 	def divStep(self, event=None):
 		if event is not None and not self.acceptKey(): return
-		step, power = ControlFrame._stepPower(self.step.get())
+		step, power = ControlFrame._stepPower(self.selectedStep.get())
 		s = step/10.0
 		if s<_LOWSTEP: s = _LOWSTEP
 		elif s>_HIGHSTEP: s = _HIGHSTEP
-		if self.zstep is not self.step and self.zstep.get() != _NOZSTEP:
-			step, power = ControlFrame._stepPower(self.zstep.get())
+		if self.zstep is not self.step and self.selectedZStep.get() != _NOZSTEP:
+			step, power = ControlFrame._stepPower(self.selectedZStep.get())
 			zs = step/10.0
 			if zs<_LOWSTEP: zs = _LOWSTEP
 			elif zs>_HIGHZSTEP: zs = _HIGHZSTEP
@@ -872,22 +1028,22 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
 
 		# ===
 		col,row=0,0
-		f2 = Frame(f)
-		f2.grid(row=row, column=col, columnspan=5,sticky=EW)
-		for p,w in enumerate(WCS):
-			col += 1
-			b = Radiobutton(f2, text=w,
-					foreground="DarkRed",
-					font = "Helvetica,14",
-					padx=1, pady=1,
-					variable=wcsvar,
-					value=p,
-					indicatoron=FALSE,
-					activebackground="LightYellow",
-					command=self.wcsChange)
-			b.pack(side=LEFT, fill=X, expand=YES)
-			tkExtra.Balloon.set(b, _("Switch to workspace %s")%(w))
-			self.addWidget(b)
+		# f2 = Frame(f)
+		# f2.grid(row=row, column=col, columnspan=5,sticky=EW)
+		# for p,w in enumerate(WCS):
+		# 	col += 1
+		# 	b = Radiobutton(f2, text=w,
+		# 			foreground="DarkRed",
+		# 			font = "Helvetica,14",
+		# 			padx=1, pady=1,
+		# 			variable=wcsvar,
+		# 			value=p,
+		# 			indicatoron=FALSE,
+		# 			activebackground="LightYellow",
+		# 			command=self.wcsChange)
+		# 	b.pack(side=LEFT, fill=X, expand=YES)
+		# 	tkExtra.Balloon.set(b, _("Switch to workspace %s")%(w))
+		# 	self.addWidget(b)
 
 		# Absolute or relative mode
 		row += 1
@@ -1261,3 +1417,5 @@ class ControlPage(CNCRibbon.Page):
 
 		self._register((ConnectionGroup, UserGroup, RunGroup),
 			(DROFrame, ControlFrame, StateFrame))
+
+		self._registerTopDroFrame(TopDROFrame)

@@ -117,7 +117,7 @@ class Config():
 #------------------------------------------------------------------------------
 def loadIcons():
 	global icons
-	icons = {}
+	icons = {"empty": tkExtra.PhotoImage(width=1, height=1)}
 	for img in glob.glob("%s%sicons%s*.gif"%(prgpath,os.sep,os.sep)):
 		name,ext = os.path.splitext(os.path.basename(img))
 		try:

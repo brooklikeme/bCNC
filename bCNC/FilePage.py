@@ -22,6 +22,7 @@ import Utils
 import Sender
 import Ribbon
 import CNCRibbon
+from CNC import WCS
 
 try:
 	from serial.tools.list_ports import comports
@@ -60,68 +61,71 @@ class _RecentMenuButton(Ribbon.MenuButton):
 class FileGroup(CNCRibbon.ButtonGroup):
 	def __init__(self, master, app):
 		CNCRibbon.ButtonGroup.__init__(self, master, N_("File"), app)
-		self.grid3rows()
+		self.grid1rows()
 
+		# # ---
+		# col,row=0,0
+		# b = Ribbon.LabelButton(self.frame, self, "<<New>>",
+		# 		image=Utils.icons["new32"],
+		# 		text=_("New"),
+		# 		compound=TOP,
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, rowspan=3, padx=0, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("New gcode/dxf file"))
+		# self.addWidget(b)
+		#
 		# ---
+
 		col,row=0,0
-		b = Ribbon.LabelButton(self.frame, self, "<<New>>",
-				image=Utils.icons["new32"],
-				text=_("New"),
-				compound=TOP,
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, rowspan=3, padx=0, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("New gcode/dxf file"))
-		self.addWidget(b)
-
-		# ---
-		col,row=1,0
 		b = Ribbon.LabelButton(self.frame, self, "<<Open>>",
 				image=Utils.icons["open32"],
+				text=_("Open"),
+				compound=TOP,
 				background=Ribbon._BACKGROUND)
 		b.grid(row=row, column=col, rowspan=2, padx=0, pady=0, sticky=NSEW)
 		tkExtra.Balloon.set(b, _("Open existing gcode/dxf file [Ctrl-O]"))
 		self.addWidget(b)
 
-		col,row=1,2
-		b = _RecentMenuButton(self.frame, None,
-				text=_("Open"),
-				image=Utils.icons["triangle_down"],
-				compound=RIGHT,
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=0, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Open recent file"))
-		self.addWidget(b)
+		# col,row=1,2
+		# b = _RecentMenuButton(self.frame, None,
+		# 		text=_("Open"),
+		# 		image=Utils.icons["triangle_down"],
+		# 		compound=RIGHT,
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, padx=0, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Open recent file"))
+		# self.addWidget(b)
 
 		# ---
-		col,row=2,0
-		b = Ribbon.LabelButton(self.frame, self, "<<Import>>",
-				image=Utils.icons["import32"],
-				text=_("Import"),
-				compound=TOP,
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, rowspan=3, padx=0, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Import gcode/dxf file"))
-		self.addWidget(b)
+		# col,row=2,0
+		# b = Ribbon.LabelButton(self.frame, self, "<<Import>>",
+		# 		image=Utils.icons["import32"],
+		# 		text=_("Import"),
+		# 		compound=TOP,
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, rowspan=3, padx=0, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Import gcode/dxf file"))
+		# self.addWidget(b)
 
 		# ---
-		col,row=3,0
-		b = Ribbon.LabelButton(self.frame, self, "<<Save>>",
-				image=Utils.icons["save32"],
-				command=app.save,
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, rowspan=2, padx=0, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Save gcode/dxf file [Ctrl-S]"))
-		self.addWidget(b)
-
-		col,row=3,2
-		b = Ribbon.LabelButton(self.frame, self, "<<SaveAs>>",
-				text=_("Save"),
-				image=Utils.icons["triangle_down"],
-				compound=RIGHT,
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=0, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Save gcode/dxf AS"))
-		self.addWidget(b)
+		# col,row=3,0
+		# b = Ribbon.LabelButton(self.frame, self, "<<Save>>",
+		# 		image=Utils.icons["save32"],
+		# 		command=app.save,
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, rowspan=2, padx=0, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Save gcode/dxf file [Ctrl-S]"))
+		# self.addWidget(b)
+		#
+		# col,row=3,2
+		# b = Ribbon.LabelButton(self.frame, self, "<<SaveAs>>",
+		# 		text=_("Save"),
+		# 		image=Utils.icons["triangle_down"],
+		# 		compound=RIGHT,
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, padx=0, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Save gcode/dxf AS"))
+		# self.addWidget(b)
 
 
 #===============================================================================
@@ -239,94 +243,237 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		CNCRibbon.PageLabelFrame.__init__(self, master, "Serial", _("Serial"), app)
 		self.autostart = BooleanVar()
 
+		height = 30
+
+		frame1 = Frame(self)
+		frame1.pack(side=TOP, fill=X)
 		# ---
 		col,row=0,0
-		b = Label(self, text=_("Port:"))
-		b.grid(row=row,column=col,sticky=E)
+		# b = Label(self, text=_("Port:"))
+		# b.grid(row=row,column=col,sticky=E)
+		# self.addWidget(b)
+
+		b = Button(frame1, text=_("Port:"),
+					command=lambda s=self : s.comportRefresh(True),
+				    image=Utils.icons["empty"],
+				    compound="c",
+					activebackground="LightYellow")
+		b.grid(row=row, column=col, sticky=E)
 		self.addWidget(b)
 
-		self.portCombo = tkExtra.Combobox(self, False, background="White", width=16, command=self.comportClean)
-		self.portCombo.grid(row=row, column=col+1, sticky=EW)
+		col += 1
+		self.selectedPort = StringVar()
+		self.selectedPort.trace('w', self.comportClean)
+		self.selectedPort.set(Utils.getStr("Connection", "port"))
+		self.portCombo = OptionMenu(frame1, self.selectedPort, *[""])
+		self.portCombo.config(padx=0, pady=1, width=5)
+		self.portCombo.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(self.portCombo, _("Select (or manual enter) port to connect"))
-		self.portCombo.set(Utils.getStr("Connection","port"))
 		self.addWidget(self.portCombo)
+
+		# self.portCombo = tkExtra.Combobox(self, False, background="White", width=16, command=self.comportClean)
+		# self.portCombo.grid(row=row, column=col+1, sticky=EW)
+		# tkExtra.Balloon.set(self.portCombo, _("Select (or manual enter) port to connect"))
+		# self.portCombo.set(Utils.getStr("Connection","port"))
+		# self.addWidget(self.portCombo)
 
 		self.comportRefresh()
 
+		col += 1
+		self.connectBtn = Ribbon.LabelButton(frame1,
+				image=Utils.icons["serial"],
+				text=_("Open"),
+				compound=LEFT,
+				command=lambda s=self : s.event_generate("<<Connect>>"),
+				background=Ribbon._BACKGROUND)
+		self.connectBtn.grid(row=row, column=col, padx=0, pady=0, sticky=NSEW)
+		tkExtra.Balloon.set(self.connectBtn, _("Open/Close serial port"))
+		self.grid_columnconfigure(1, weight=1)
 
+		frame1.grid_columnconfigure(1, weight=1)
+
+		# ---------------------------------------------------------------
+		frame2 = Frame(self)
+		frame2.pack(side=TOP, fill=X)
 		# ---
-		row += 1
-		b = Label(self, text=_("Baud:"))
-		b.grid(row=row,column=col,sticky=E)
-
-		self.baudCombo = tkExtra.Combobox(self, True, background="White")
-		self.baudCombo.grid(row=row, column=col+1, sticky=EW)
-		tkExtra.Balloon.set(self.baudCombo, _("Select connection baud rate"))
-		self.baudCombo.fill(BAUDS)
-		self.baudCombo.set(Utils.getStr("Connection","baud","115200"))
-		self.addWidget(self.baudCombo)
-
-		# ---
-		row += 1
-		b = Label(self, text=_("Controller:"))
-		b.grid(row=row,column=col,sticky=E)
-
-		self.ctrlCombo = tkExtra.Combobox(self, True,
-					background="White",
-					command=self.ctrlChange)
-		self.ctrlCombo.grid(row=row, column=col+1, sticky=EW)
-		tkExtra.Balloon.set(self.ctrlCombo, _("Select controller board"))
-		#self.ctrlCombo.fill(sorted(Utils.CONTROLLER.keys()))
-		self.ctrlCombo.fill(self.app.controllerList())
-		self.ctrlCombo.set(app.controller)
-		self.addWidget(self.ctrlCombo)
-
-		# ---
-		row += 1
-		b= Checkbutton(self, text=_("Connect on startup"),
-					variable=self.autostart)
-		b.grid(row=row, column=col, columnspan=2, sticky=W)
-		tkExtra.Balloon.set(b, _("Connect to serial on startup of the program"))
-		self.autostart.set(Utils.getBool("Connection","openserial"))
+		row = 0
+		col = 0
+		b = Ribbon.LabelButton(frame2,
+				image=Utils.icons["unlock"],
+				text=_("Unlock"),
+				height=height,
+				compound=LEFT,
+				command=app.unlock,
+				activebackground="LightYellow")
+		b.grid(row=row, column=col, padx=0, pady=0, sticky=EW)
+		tkExtra.Balloon.set(b, _("Unlock controller [$X]"))
 		self.addWidget(b)
+
+		col += 1
+		b = Ribbon.LabelButton(frame2,
+				image=Utils.icons["reset"],
+				text=_("Reset"),
+				height=height,
+				compound=LEFT,
+				command=app.softReset,
+				activebackground="LightYellow")
+		b.grid(row=row, column=col, padx=0, pady=0, sticky=EW)
+		tkExtra.Balloon.set(b, _("Software reset of controller [ctrl-x]"))
+		self.addWidget(b)
+
+		col += 1
+		b = Ribbon.LabelButton(frame2,
+				image=Utils.icons["home"],
+				text=_("Home"),
+				height=height,
+				compound=LEFT,
+				command=app.home,
+				activebackground="LightYellow")
+		b.grid(row=row, column=col, padx=0, pady=0, sticky=EW)
+		tkExtra.Balloon.set(b, _("Perform a homing cycle [$H]"))
+		self.addWidget(b)
+
+		#--------------------------------------------------------
+		row += 1
+		col = 0
+		self.xzero = Ribbon.LabelButton(frame2, text=_("X=0"),
+				command=self.setX0,
+				image=Utils.icons["origin"],
+				height=height,
+				compound=LEFT,
+				activebackground="LightYellow")
+		self.xzero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.xzero, _("Set X coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.xzero)
+
+		col += 1
+		self.yzero = Ribbon.LabelButton(frame2, text=_("Y=0"),
+				command=self.setY0,
+				image=Utils.icons["origin"],
+				height=height,
+				compound=LEFT,
+				activebackground="LightYellow")
+		self.yzero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.yzero, _("Set Y coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.yzero)
+
+		col += 1
+		self.zzero = Ribbon.LabelButton(frame2, text=_("Z=0"),
+				command=self.setZ0,
+				image=Utils.icons["origin"],
+				height=height,
+				compound=LEFT,
+				activebackground="LightYellow")
+		self.zzero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.zzero, _("Set Z coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.zzero)
+
+
+
+		frame2.grid_columnconfigure(0, weight=1)
+		frame2.grid_columnconfigure(1, weight=1)
+		frame2.grid_columnconfigure(2, weight=1)
+
+		# b = Label(self, text=_("Baud:"))
+		# b.grid(row=row,column=col,sticky=E)
+		#
+		# self.baudCombo = tkExtra.Combobox(self, True, background="White")
+		# self.baudCombo.grid(row=row, column=col+1, sticky=EW)
+		# tkExtra.Balloon.set(self.baudCombo, _("Select connection baud rate"))
+		# self.baudCombo.fill(BAUDS)
+		# self.baudCombo.set(Utils.getStr("Connection","baud","115200"))
+		# self.addWidget(self.baudCombo)
+		self.baudCombo = StringVar()
+		self.baudCombo.set("115200")
+
+		# ---
+		row += 1
+		# b = Label(self, text=_("Controller:"))
+		# b.grid(row=row,column=col,sticky=E)
+		#
+		# self.ctrlCombo = tkExtra.Combobox(self, True,
+		# 			background="White",
+		# 			command=self.ctrlChange)
+		# self.ctrlCombo.grid(row=row, column=col+1, sticky=EW)
+		# tkExtra.Balloon.set(self.ctrlCombo, _("Select controller board"))
+		# #self.ctrlCombo.fill(sorted(Utils.CONTROLLER.keys()))
+		# self.ctrlCombo.fill(self.app.controllerList())
+		# self.ctrlCombo.set(app.controller)
+		# self.addWidget(self.ctrlCombo)
+
+		# ---
+		row += 1
+		# b= Checkbutton(self, text=_("Connect on startup"),
+		# 			variable=self.autostart)
+		# b.grid(row=row, column=col, columnspan=2, sticky=W)
+		# tkExtra.Balloon.set(b, _("Connect to serial on startup of the program"))
+		# self.autostart.set(Utils.getBool("Connection","openserial"))
+		# self.addWidget(b)
 
 		# ---
 		col += 2
-		self.comrefBtn = Ribbon.LabelButton(self,
-				image=Utils.icons["refresh"],
-				text=_("Refresh"),
-				compound=TOP,
-				command=lambda s=self : s.comportRefresh(True),
-				background=Ribbon._BACKGROUND)
-		self.comrefBtn.grid(row=row, column=col, padx=0, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(self.comrefBtn, _("Refresh list of serial ports"))
+		# self.comrefBtn = Ribbon.LabelButton(self,
+		# 		image=Utils.icons["refresh"],
+		# 		text=_("Refresh"),
+		# 		compound=TOP,
+		# 		command=lambda s=self : s.comportRefresh(True),
+		# 		background=Ribbon._BACKGROUND)
+		# self.comrefBtn.grid(row=row, column=col, padx=0, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(self.comrefBtn, _("Refresh list of serial ports"))
 
 		# ---
 		#col += 2
 		row  = 0
 
-		self.connectBtn = Ribbon.LabelButton(self,
-				image=Utils.icons["serial48"],
-				text=_("Open"),
-				compound=TOP,
-				command=lambda s=self : s.event_generate("<<Connect>>"),
-				background=Ribbon._BACKGROUND)
-		self.connectBtn.grid(row=row, column=col, rowspan=3, padx=0, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(self.connectBtn, _("Open/Close serial port"))
-		self.grid_columnconfigure(1, weight=1)
+	#----------------------------------------------------------------------
+	def setX0(self, event=None):
+		self._wcsSet("0",None,None)
+
+	#----------------------------------------------------------------------
+	def setY0(self, event=None):
+		self._wcsSet(None,"0",None)
+
+	#----------------------------------------------------------------------
+	def setZ0(self, event=None):
+		self._wcsSet(None,None,"0")
+
+	#----------------------------------------------------------------------
+	def _wcsSet(self, x, y, z):
+		global wcsvar
+		p = wcsvar.get()
+		if p<6:
+			cmd = "G10L20P%d"%(p+1)
+		elif p==6:
+			cmd = "G28.1"
+		elif p==7:
+			cmd = "G30.1"
+		elif p==8:
+			cmd = "G92"
+
+		pos = ""
+		if x is not None: pos += "X"+str(x)
+		if y is not None: pos += "Y"+str(y)
+		if z is not None: pos += "Z"+str(z)
+		cmd += pos
+		self.sendGCode(cmd)
+		self.sendGCode("$#")
+		self.event_generate("<<Status>>",
+			data=(_("Set workspace %s to %s")%(WCS[p],pos)))
+			#data=(_("Set workspace %s to %s")%(WCS[p],pos)).encode("utf8"))
+		self.event_generate("<<CanvasFocus>>")
 
 	#-----------------------------------------------------------------------
-	def ctrlChange(self):
-		#self.app.controller = Utils.CONTROLLER.get(self.ctrlCombo.get(), 0)
-		#print("selected",self.ctrlCombo.get())
-		self.app.controllerSet(self.ctrlCombo.get())
+	# def ctrlChange(self):
+	# 	#self.app.controller = Utils.CONTROLLER.get(self.ctrlCombo.get(), 0)
+	# 	#print("selected",self.ctrlCombo.get())
+	# 	self.app.controllerSet(self.ctrlCombo.get())
 
 	#-----------------------------------------------------------------------
-	def comportClean(self, event=None):
-		clean = self.portCombo.get().split("\t")[0]
-		if(self.portCombo.get() != clean):
+	def comportClean(self, a=None, b=None, c=None):
+		clean = self.selectedPort.get().split("\t")[0]
+		if(self.selectedPort.get() != clean):
 			print("comport fix")
-			self.portCombo.set(clean)
+			self.selectedPort.set(clean)
 
 	#-----------------------------------------------------------------------
 	def comportsGet(self):
@@ -336,6 +483,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 			print("Using old style comports()!")
 			return comports()
 
+	#-----------------------------------------------------------------------
 	def comportRefresh(self, dbg=False):
 		#Detect devices
 		hwgrep = []
@@ -363,15 +511,18 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 			if i.split("\t")[0] != devprev: devices_clean += [i]
 			devprev = i.split("\t")[0]
 
-		self.portCombo.fill(devices_clean)
+		menu = self.portCombo["menu"]
+		menu.delete(0, "end")
+		for string in devices_clean:
+			menu.add_command(label=string, command=lambda value=string: self.selectedPort.set(value))
 
 	#-----------------------------------------------------------------------
 	def saveConfig(self):
 		# Connection
-		Utils.setStr("Connection", "controller",  self.app.controller)
-		Utils.setStr("Connection", "port",        self.portCombo.get().split("\t")[0])
-		Utils.setStr("Connection", "baud",        self.baudCombo.get())
-		Utils.setBool("Connection", "openserial", self.autostart.get())
+		# Utils.setStr("Connection", "controller",  self.app.controller)
+		Utils.setStr("Connection", "port",        self.selectedPort.get().split("\t")[0])
+		# Utils.setStr("Connection", "baud",        self.baudCombo.get())
+		# Utils.setBool("Connection", "openserial", self.autostart.get())
 
 
 #===============================================================================
@@ -380,14 +531,16 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 class FilePage(CNCRibbon.Page):
 	__doc__ = _("File I/O and configuration")
 	_name_  = N_("File")
-	_icon_  = "new"
+	_icon_  = "new32"
 
 	#----------------------------------------------------------------------
 	# Add a widget in the widgets list to enable disable during the run
 	#----------------------------------------------------------------------
 	def register(self):
+		global wcsvar
+		wcsvar = IntVar()
+		wcsvar.set(0)
+
 		self._register((FileGroup,
-				PendantGroup,
-				OptionsGroup,
 				CloseGroup),
 				(SerialFrame,))

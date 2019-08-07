@@ -88,6 +88,10 @@ class LabelGroup(Frame):
 		self.label.pack(side=BOTTOM, fill=X, pady=0)
 
 	#-----------------------------------------------------------------------
+	def grid1rows(self):
+		self.frame.grid_rowconfigure(0, weight=1)
+
+	#-----------------------------------------------------------------------
 	def grid2rows(self):
 		self.frame.grid_rowconfigure(0, weight=1)
 		self.frame.grid_rowconfigure(1, weight=1)
@@ -302,7 +306,8 @@ class TabButton(Radiobutton):
 				borderwidth        = 0,
 				highlightthickness = 0,
 				padx               = 5,
-				pady               = 0,
+				pady               = 5,
+				compound    = TOP,
 				background         = _BACKGROUND_DISABLE
 			)
 		self.bind("<FocusIn>",		self._focusIn)
@@ -339,6 +344,7 @@ class Page:		# <--- should be possible to be a toplevel as well
 	_name_ = None
 	_icon_ = None
 	_doc_  = "Tooltip"
+	_topdroframe = None
 
 	#-----------------------------------------------------------------------
 	def __init__(self, master, **kw):
@@ -514,70 +520,72 @@ class TabRibbonFrame(Frame):
 		frame = Frame(self, background=_BACKGROUND_DISABLE)
 		frame.pack(side=TOP, fill=X)
 
-		# --- Basic buttons ---
-		b = LabelButton(frame, self, "<<New>>",
-				image=Utils.icons["new"],
-				background=_BACKGROUND_DISABLE)
-		tkExtra.Balloon.set(b, _("New file"))
-		b.pack(side=LEFT)
+		#
+		# b = LabelButton(frame, self, "<<Open>>",
+		# 		image=Utils.icons["load"],
+		# 		background=_BACKGROUND_DISABLE)
+		# tkExtra.Balloon.set(b, _("Open file [Ctrl-O]"))
+		# b.pack(side=LEFT)
+		#
+		# b = LabelButton(frame, self, "<<Save>>",
+		# 		image=Utils.icons["save"],
+		# # 		background=_BACKGROUND_DISABLE)
+		# tkExtra.Balloon.set(b, _("Save all [Ctrl-S]"))
+		# b.pack(side=LEFT)
+		#
+		# b = LabelButton(frame, self, "<<Undo>>",
+		# 		image=Utils.icons["undo"],
+		# 		background=_BACKGROUND_DISABLE)
+		# tkExtra.Balloon.set(b, _("Undo [Ctrl-Z]"))
+		# b.pack(side=LEFT)
+		# self.tool["undo"] = b
+		#
+		# b = LabelButton(frame, image=Utils.icons["triangle_down"],
+		# 		command=self.undolist,
+		# 		background=_BACKGROUND_DISABLE)
+		# b.pack(side=LEFT)
+		# self.tool["undolist"] = b
+		#
+		# b = LabelButton(frame, self, "<<Redo>>",
+		# 		image=Utils.icons["redo"],
+		# 		background=_BACKGROUND_DISABLE)
+		# tkExtra.Balloon.set(b, _("Redo [Ctrl-Y]"))
+		# b.pack(side=LEFT)
+		# self.tool["redo"] = b
 
-		b = LabelButton(frame, self, "<<Open>>",
-				image=Utils.icons["load"],
-				background=_BACKGROUND_DISABLE)
-		tkExtra.Balloon.set(b, _("Open file [Ctrl-O]"))
-		b.pack(side=LEFT)
-
-		b = LabelButton(frame, self, "<<Save>>",
-				image=Utils.icons["save"],
-				background=_BACKGROUND_DISABLE)
-		tkExtra.Balloon.set(b, _("Save all [Ctrl-S]"))
-		b.pack(side=LEFT)
-
-		b = LabelButton(frame, self, "<<Undo>>",
-				image=Utils.icons["undo"],
-				background=_BACKGROUND_DISABLE)
-		tkExtra.Balloon.set(b, _("Undo [Ctrl-Z]"))
-		b.pack(side=LEFT)
-		self.tool["undo"] = b
-
-		b = LabelButton(frame, image=Utils.icons["triangle_down"],
-				command=self.undolist,
-				background=_BACKGROUND_DISABLE)
-		b.pack(side=LEFT)
-		self.tool["undolist"] = b
-
-		b = LabelButton(frame, self, "<<Redo>>",
-				image=Utils.icons["redo"],
-				background=_BACKGROUND_DISABLE)
-		tkExtra.Balloon.set(b, _("Redo [Ctrl-Y]"))
-		b.pack(side=LEFT)
-		self.tool["redo"] = b
-
-		Label(frame, image=Utils.icons["sep"],
-				background=_BACKGROUND_DISABLE).pack(side=LEFT, padx=3)
+		# Label(frame, image=Utils.icons["sep"],
+		# 		background=_BACKGROUND_DISABLE).pack(side=LEFT, padx=3)
 
 		# --- Help ---
-		b = LabelButton(frame, self, "<<Help>>",
-				image=Utils.icons["info"],
-				background=_BACKGROUND_DISABLE)
-		tkExtra.Balloon.set(b, _("Help [F1]"))
-		b.pack(side=RIGHT, padx=2)
-
-		Label(frame, image=Utils.icons["sep"],
-				background=_BACKGROUND_DISABLE).pack(side=RIGHT, padx=3)
+		# b = LabelButton(frame, self, "<<Help>>",
+		# 		image=Utils.icons["info"],
+		# 		background=_BACKGROUND_DISABLE)
+		# tkExtra.Balloon.set(b, _("Help [F1]"))
+		# b.pack(side=RIGHT, padx=2)
+		#
+		# Label(frame, image=Utils.icons["sep"],
+		# 		background=_BACKGROUND_DISABLE).pack(side=RIGHT, padx=3)
 
 		# --- TabBar ---
-		self._tabFrame = Frame(frame, background=_BACKGROUND_DISABLE)
-		self._tabFrame.pack(side=LEFT, fill=BOTH, expand=YES)
+		self._tabFrame = Frame(frame,
+							   background=_BACKGROUND)
+		self._tabFrame.pack(side=LEFT, fill=Y)
 
 		# ==== Ribbon Frame ====
-		self._ribbonFrame = Frame(self,
+		self._ribbonFrame = Frame(frame,
 						background=_BACKGROUND,
-						pady=0,
 						relief=RAISED)
-		self._ribbonFrame.pack(fill=BOTH, expand=YES, padx=0, pady=0)
+		self._ribbonFrame.pack(side=LEFT)
+
+		# --- Top DroBar ---
+		self._topdroFrame = Frame(frame,
+						background=_BACKGROUND,
+						relief=RAISED)
+		self._topdroFrame.pack(side=RIGHT)
+
 
 		self.setPageFrame(None)
+
 
 	#-----------------------------------------------------------------------
 	def setPageFrame(self, frame):
@@ -604,7 +612,7 @@ class TabRibbonFrame(Frame):
 				command  = self.changePage)
 		tkExtra.Balloon.set(page._tab, page.__doc__)
 
-		page._tab.pack(side=side, fill=Y, padx=5)
+		page._tab.pack(side=side, fill=Y, padx=1)
 
 	# ----------------------------------------------------------------------
 	# Unpack the old page
@@ -646,6 +654,10 @@ class TabRibbonFrame(Frame):
 
 		for frame,args in page.frames:
 			frame.pack(in_=self._pageFrame, **args)
+
+		# Top Dro Frame
+		args = {"side": LEFT, "fill": BOTH}
+		page._topdroframe.pack(in_=self._topdroFrame, **args)
 
 		self.oldActive = page
 		page.activate()
