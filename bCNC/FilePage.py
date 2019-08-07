@@ -298,7 +298,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		# ---
 		row = 0
 		col = 0
-		b = Ribbon.LabelButton(frame2,
+		b = Button(frame2,
 				image=Utils.icons["unlock"],
 				text=_("Unlock"),
 				height=height,
@@ -310,7 +310,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		self.addWidget(b)
 
 		col += 1
-		b = Ribbon.LabelButton(frame2,
+		b = Button(frame2,
 				image=Utils.icons["reset"],
 				text=_("Reset"),
 				height=height,
@@ -322,7 +322,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		self.addWidget(b)
 
 		col += 1
-		b = Ribbon.LabelButton(frame2,
+		b = Button(frame2,
 				image=Utils.icons["home"],
 				text=_("Home"),
 				height=height,
@@ -336,7 +336,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		#--------------------------------------------------------
 		row += 1
 		col = 0
-		self.xzero = Ribbon.Button(frame2, text=_("X=0"),
+		self.xzero = Button(frame2, text=_("X=0"),
 				command=self.setX0,
 				image=Utils.icons["origin"],
 				height=height,
@@ -347,7 +347,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		self.addWidget(self.xzero)
 
 		col += 1
-		self.yzero = Ribbon.LabelButton(frame2, text=_("Y=0"),
+		self.yzero = Button(frame2, text=_("Y=0"),
 				command=self.setY0,
 				image=Utils.icons["origin"],
 				height=height,
@@ -358,7 +358,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		self.addWidget(self.yzero)
 
 		col += 1
-		self.zzero = Ribbon.LabelButton(frame2, text=_("Z=0"),
+		self.zzero = Button(frame2, text=_("Z=0"),
 				command=self.setZ0,
 				image=Utils.icons["origin"],
 				height=height,
