@@ -336,7 +336,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		#--------------------------------------------------------
 		row += 1
 		col = 0
-		self.xzero = Ribbon.LabelButton(frame2, text=_("X=0"),
+		self.xzero = Ribbon.Button(frame2, text=_("X=0"),
 				command=self.setX0,
 				image=Utils.icons["origin"],
 				height=height,
