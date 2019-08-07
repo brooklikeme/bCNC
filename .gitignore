@@ -8,3 +8,4 @@ bCNC.egg-info
 .eggs
 dist
 build
+.DS_Store
