@@ -1761,7 +1761,7 @@ class CameraFrame(CNCRibbon.PageFrame):
 #===============================================================================
 class ToolGroup(CNCRibbon.ButtonGroup):
 	def __init__(self, master, app):
-		CNCRibbon.ButtonGroup.__init__(self, master, "Probe:Tool", app)
+		CNCRibbon.ButtonGroup.__init__(self, master, "Probe1:Tool", app)
 		self.label["background"] = Ribbon._BACKGROUND_GROUP2
 
 		b = Ribbon.LabelButton(self.frame, self, "<<ToolCalibrate>>",

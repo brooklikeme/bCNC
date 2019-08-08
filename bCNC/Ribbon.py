@@ -517,7 +517,7 @@ class TabRibbonFrame(Frame):
 		self.pages      = {}
 
 		# === Top frame with buttons ===
-		frame = Frame(self, background=_BACKGROUND_DISABLE)
+		frame = Frame(self, background=_BACKGROUND)
 		frame.pack(side=TOP, fill=X)
 
 		#

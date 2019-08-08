@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-12-09 20:46+0100\n"
-"PO-Revision-Date: 2019-08-08 17:39+0800\n"
+"PO-Revision-Date: 2019-08-08 17:41+0800\n"
 "Last-Translator: @SteveMoto [GitHub]\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -1362,7 +1362,7 @@ msgstr "从gcode文件获取边距"
 
 #: bCNC/ProbePage.py:154
 msgid "Zero"
-msgstr "零"
+msgstr "置零"
 
 #: bCNC/ProbePage.py:159
 msgid ""
