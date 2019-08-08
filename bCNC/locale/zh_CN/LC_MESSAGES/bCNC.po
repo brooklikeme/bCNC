@@ -1324,7 +1324,13 @@ msgstr "探测前后"
 #: bCNC/ProbePage.py:75 bCNC/ProbePage.py:82 bCNC/ProbePage.py:404
 #: bCNC/ProbePage.py:475 bCNC/bCNC.py:91 bCNC/__main__.py:91
 msgid "Probe"
-msgstr "探测"
+msgstr "对刀"
+
+msgid "Z Probe"
+msgstr "Z轴对刀"
+
+msgid "XYZ Probe"
+msgstr "XYZ对刀"
 
 #: bCNC/ProbePage.py:88
 msgid "Simple probing along a direction"
@@ -1493,8 +1499,12 @@ msgid "Probe along Z direction"
 msgstr "沿Z方向探测"
 
 #: bCNC/ProbePage.py:482
-msgid "Perform a single probe cycle"
-msgstr "执行单一探测过程"
+msgid "Perform single Z probe cycle"
+msgstr "执行单一Z探测过程"
+
+#: bCNC/ProbePage.py:482
+msgid "Perform XYZ probe cycle"
+msgstr "执行XYZ探测过程"
 
 #: bCNC/ProbePage.py:495
 msgid "Diameter:"

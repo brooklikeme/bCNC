@@ -280,7 +280,7 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		self.comportRefresh()
 
 		col += 1
-		self.connectBtn = Ribbon.LabelButton(frame1,
+		self.connectBtn = Button(frame1,
 				image=Utils.icons["serial"],
 				text=_("Open"),
 				compound=LEFT,
@@ -333,40 +333,40 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		tkExtra.Balloon.set(b, _("Perform a homing cycle [$H]"))
 		self.addWidget(b)
 
-		#--------------------------------------------------------
-		row += 1
-		col = 0
-		self.xzero = Button(frame2, text=_("X=0"),
-				command=self.setX0,
-				image=Utils.icons["origin"],
-				height=height,
-				compound=LEFT,
-				activebackground="LightYellow")
-		self.xzero.grid(row=row, column=col, pady=0, sticky=EW)
-		tkExtra.Balloon.set(self.xzero, _("Set X coordinate to zero (or to typed coordinate in WPos)"))
-		self.addWidget(self.xzero)
-
-		col += 1
-		self.yzero = Button(frame2, text=_("Y=0"),
-				command=self.setY0,
-				image=Utils.icons["origin"],
-				height=height,
-				compound=LEFT,
-				activebackground="LightYellow")
-		self.yzero.grid(row=row, column=col, pady=0, sticky=EW)
-		tkExtra.Balloon.set(self.yzero, _("Set Y coordinate to zero (or to typed coordinate in WPos)"))
-		self.addWidget(self.yzero)
-
-		col += 1
-		self.zzero = Button(frame2, text=_("Z=0"),
-				command=self.setZ0,
-				image=Utils.icons["origin"],
-				height=height,
-				compound=LEFT,
-				activebackground="LightYellow")
-		self.zzero.grid(row=row, column=col, pady=0, sticky=EW)
-		tkExtra.Balloon.set(self.zzero, _("Set Z coordinate to zero (or to typed coordinate in WPos)"))
-		self.addWidget(self.zzero)
+		# #--------------------------------------------------------
+		# row += 1
+		# col = 0
+		# self.xzero = Button(frame2, text=_("X=0"),
+		# 		command=self.setX0,
+		# 		image=Utils.icons["origin"],
+		# 		height=height,
+		# 		compound=LEFT,
+		# 		activebackground="LightYellow")
+		# self.xzero.grid(row=row, column=col, pady=0, sticky=EW)
+		# tkExtra.Balloon.set(self.xzero, _("Set X coordinate to zero (or to typed coordinate in WPos)"))
+		# self.addWidget(self.xzero)
+		#
+		# col += 1
+		# self.yzero = Button(frame2, text=_("Y=0"),
+		# 		command=self.setY0,
+		# 		image=Utils.icons["origin"],
+		# 		height=height,
+		# 		compound=LEFT,
+		# 		activebackground="LightYellow")
+		# self.yzero.grid(row=row, column=col, pady=0, sticky=EW)
+		# tkExtra.Balloon.set(self.yzero, _("Set Y coordinate to zero (or to typed coordinate in WPos)"))
+		# self.addWidget(self.yzero)
+		#
+		# col += 1
+		# self.zzero = Button(frame2, text=_("Z=0"),
+		# 		command=self.setZ0,
+		# 		image=Utils.icons["origin"],
+		# 		height=height,
+		# 		compound=LEFT,
+		# 		activebackground="LightYellow")
+		# self.zzero.grid(row=row, column=col, pady=0, sticky=EW)
+		# tkExtra.Balloon.set(self.zzero, _("Set Z coordinate to zero (or to typed coordinate in WPos)"))
+		# self.addWidget(self.zzero)
 
 
 

@@ -359,62 +359,62 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		# Record point
 		#----------------------------------------------------------------
 
-		recframe = tkExtra.ExLabelFrame(self, text=_("Record"), foreground="DarkBlue")
-		recframe.pack(side=TOP, expand=YES, fill=X)
+		# recframe = tkExtra.ExLabelFrame(self, text=_("Record"), foreground="DarkBlue")
+		# recframe.pack(side=TOP, expand=YES, fill=X)
 
 		#Label(lframe(), text=_("Diameter:")).pack(side=LEFT)
 		#self.diameter = tkExtra.FloatEntry(lframe(), background="White")
 		#self.diameter.pack(side=LEFT, expand=YES, fill=X)
 
-		self.recz=IntVar()
-		self.reczb = Checkbutton(recframe(), text=_("Z"),
-			variable=self.recz, #onvalue=1, offvalue=0,
-			activebackground="LightYellow",
-			padx=2, pady=1)
-		tkExtra.Balloon.set(self.reczb, _("Record Z coordinate?"))
-		self.reczb.pack(side=LEFT, expand=YES, fill=X)
-		self.addWidget(self.reczb)
-
-		self.rr = Button(recframe(), text=_("RAPID"),
-			command=self.recordRapid,
-			activebackground="LightYellow",
-			padx=2, pady=1)
-		self.rr.pack(side=LEFT, expand=YES, fill=X)
-		self.addWidget(self.rr)
-
-		self.rr = Button(recframe(), text=_("FEED"),
-			command=self.recordFeed,
-			activebackground="LightYellow",
-			padx=2, pady=1)
-		self.rr.pack(side=LEFT, expand=YES, fill=X)
-		self.addWidget(self.rr)
-
-		self.rr = Button(recframe(), text=_("POINT"),
-			command=self.recordPoint,
-			activebackground="LightYellow",
-			padx=2, pady=1)
-		self.rr.pack(side=LEFT, expand=YES, fill=X)
-		self.addWidget(self.rr)
-
-		self.rr = Button(recframe(), text=_("CIRCLE"),
-			command=self.recordCircle,
-			activebackground="LightYellow",
-			padx=2, pady=1)
-		self.rr.pack(side=LEFT, expand=YES, fill=X)
-		self.addWidget(self.rr)
-
-		self.rr = Button(recframe(), text=_("FINISH"),
-			command=self.recordFinishAll,
-			activebackground="LightYellow",
-			padx=2, pady=1)
-		self.rr.pack(side=LEFT, expand=YES, fill=X)
-		self.addWidget(self.rr)
-
-		self.recsiz = tkExtra.FloatEntry(recframe(), background="White")
-		tkExtra.Balloon.set(self.recsiz, _("Circle radius"))
-		self.recsiz.set(10)
-		self.recsiz.pack(side=BOTTOM, expand=YES, fill=X)
-		self.addWidget(self.recsiz)
+		# self.recz=IntVar()
+		# self.reczb = Checkbutton(recframe(), text=_("Z"),
+		# 	variable=self.recz, #onvalue=1, offvalue=0,
+		# 	activebackground="LightYellow",
+		# 	padx=2, pady=1)
+		# tkExtra.Balloon.set(self.reczb, _("Record Z coordinate?"))
+		# self.reczb.pack(side=LEFT, expand=YES, fill=X)
+		# self.addWidget(self.reczb)
+		#
+		# self.rr = Button(recframe(), text=_("RAPID"),
+		# 	command=self.recordRapid,
+		# 	activebackground="LightYellow",
+		# 	padx=2, pady=1)
+		# self.rr.pack(side=LEFT, expand=YES, fill=X)
+		# self.addWidget(self.rr)
+		#
+		# self.rr = Button(recframe(), text=_("FEED"),
+		# 	command=self.recordFeed,
+		# 	activebackground="LightYellow",
+		# 	padx=2, pady=1)
+		# self.rr.pack(side=LEFT, expand=YES, fill=X)
+		# self.addWidget(self.rr)
+		#
+		# self.rr = Button(recframe(), text=_("POINT"),
+		# 	command=self.recordPoint,
+		# 	activebackground="LightYellow",
+		# 	padx=2, pady=1)
+		# self.rr.pack(side=LEFT, expand=YES, fill=X)
+		# self.addWidget(self.rr)
+		#
+		# self.rr = Button(recframe(), text=_("CIRCLE"),
+		# 	command=self.recordCircle,
+		# 	activebackground="LightYellow",
+		# 	padx=2, pady=1)
+		# self.rr.pack(side=LEFT, expand=YES, fill=X)
+		# self.addWidget(self.rr)
+		#
+		# self.rr = Button(recframe(), text=_("FINISH"),
+		# 	command=self.recordFinishAll,
+		# 	activebackground="LightYellow",
+		# 	padx=2, pady=1)
+		# self.rr.pack(side=LEFT, expand=YES, fill=X)
+		# self.addWidget(self.rr)
+		#
+		# self.recsiz = tkExtra.FloatEntry(recframe(), background="White")
+		# tkExtra.Balloon.set(self.recsiz, _("Circle radius"))
+		# self.recsiz.set(10)
+		# self.recsiz.pack(side=BOTTOM, expand=YES, fill=X)
+		# self.addWidget(self.recsiz)
 
 		#----------------------------------------------------------------
 		# Single probe
@@ -423,274 +423,305 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		lframe.pack(side=TOP, fill=X)
 
 		row,col = 0,0
-		Label(lframe(), text=_("Probe:")).grid(row=row, column=col, sticky=E)
+		Label(lframe(), text=_("Ancher:")).grid(row=row, column=col, sticky=E)
 
 		col += 1
-		self._probeX = Label(lframe(), foreground="DarkBlue", background="gray90")
-		self._probeX.grid(row=row, column=col, padx=1, sticky=EW+S)
+		self.selectedAncher = StringVar()
+		self.selectedAncher.trace('w', self.ancherChange)
 
-		col += 1
-		self._probeY = Label(lframe(), foreground="DarkBlue", background="gray90")
-		self._probeY.grid(row=row, column=col, padx=1, sticky=EW+S)
+		self.ancherCombo = OptionMenu(lframe(), self.selectedAncher, *["Ancher1","Ancher2","Ancher3"])
+		self.ancherCombo.config(padx=0, pady=1)
+		self.ancherCombo.grid(row=row, column=col, columnspan=2, sticky=EW)
+		tkExtra.Balloon.set(self.ancherCombo, _("Select ancher."))
+		self.addWidget(self.ancherCombo)
 
-		col += 1
-		self._probeZ = Label(lframe(), foreground="DarkBlue", background="gray90")
-		self._probeZ.grid(row=row, column=col, padx=1, sticky=EW+S)
-
-		# ---
-		col += 1
-		self.probeautogotonext = False
-		self.probeautogoto=IntVar()
-		self.autogoto = Checkbutton(lframe(), "",
-			variable=self.probeautogoto, #onvalue=1, offvalue=0,
-			activebackground="LightYellow",
-			padx=2, pady=1)
-		self.autogoto.select()
-		tkExtra.Balloon.set(self.autogoto, _("Automatic GOTO after probing"))
-		#self.autogoto.pack(side=LEFT, expand=YES, fill=X)
-		self.autogoto.grid(row=row, column=col, padx=1, sticky=EW)
-		self.addWidget(self.autogoto)
-
-		# ---
-		col += 1
-		b = Button(lframe(),
-				image=Utils.icons["rapid"],
-				text=_("Goto"),
-				compound=LEFT,
-				command=self.goto2Probe,
-#				width=48,
-				padx=5, pady=0)
-		b.grid(row=row, column=col, padx=1, sticky=EW)
-		self.addWidget(b)
-		tkExtra.Balloon.set(b, _("Rapid goto to last probe location"))
-
-		# ---
-		row,col = row+1,0
-		Label(lframe(), text=_("Pos:")).grid(row=row, column=col, sticky=E)
-
-		col += 1
-		self.probeXdir = tkExtra.FloatEntry(lframe(), background="White")
-		self.probeXdir.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.probeXdir, _("Probe along X direction"))
-		self.addWidget(self.probeXdir)
-
-		col += 1
-		self.probeYdir = tkExtra.FloatEntry(lframe(), background="White")
-		self.probeYdir.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.probeYdir, _("Probe along Y direction"))
-		self.addWidget(self.probeYdir)
-
-		col += 1
-		self.probeZdir = tkExtra.FloatEntry(lframe(), background="White")
-		self.probeZdir.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.probeZdir, _("Probe along Z direction"))
-		self.addWidget(self.probeZdir)
+		# # ---
+		# col += 1
+		# self.probeautogotonext = False
+		# self.probeautogoto=IntVar()
+		# self.autogoto = Checkbutton(lframe(), "",
+		# 	variable=self.probeautogoto, #onvalue=1, offvalue=0,
+		# 	activebackground="LightYellow",
+		# 	padx=2, pady=1)
+		# self.autogoto.select()
+		# tkExtra.Balloon.set(self.autogoto, _("Automatic GOTO after probing"))
+		# #self.autogoto.pack(side=LEFT, expand=YES, fill=X)
+		# self.autogoto.grid(row=row, column=col, rowspan=2, padx=1, sticky=EW)
+		# self.addWidget(self.autogoto)
 
 		# ---
 		col += 2
-		b = Button(lframe(), #"<<Probe>>",
-				image=Utils.icons["probe32"],
-				text=_("Probe"),
+		b = Button(lframe(),
+				image=Utils.icons["rapid"],
+				text=_("Goto Ancher"),
 				compound=LEFT,
-				command=self.probe,
+				command=self.gotoAncher,
+				padx=5, pady=0)
+		b.grid(row=row, column=col, rowspan=2, padx=1, sticky=NSEW)
+		self.addWidget(b)
+		tkExtra.Balloon.set(b, _("Rapid goto to ancher position"))
+
+		# ---
+		row,col = row + 1,0
+		Label(lframe(), text=_("WPos:")).grid(row=row, column=col, sticky=E)
+
+		col += 1
+		self._ankerX = Label(lframe(), foreground="DarkBlue", background="gray90")
+		self._ankerX.grid(row=row, column=col, padx=1, sticky=EW+S)
+
+		col += 1
+		self._ankerY = Label(lframe(), foreground="DarkBlue", background="gray90")
+		self._ankerY.grid(row=row, column=col, padx=1, sticky=EW+S)
+
+		self.selectedAncher.set("Ancher1")
+
+		#
+		# col += 1
+		# self.probeXdir = tkExtra.FloatEntry(lframe(), background="White")
+		# self.probeXdir.grid(row=row, column=col, sticky=EW)
+		# tkExtra.Balloon.set(self.probeXdir, _("Probe along X direction"))
+		# self.addWidget(self.probeXdir)
+		#
+		# col += 1
+		# self.probeYdir = tkExtra.FloatEntry(lframe(), background="White")
+		# self.probeYdir.grid(row=row, column=col, sticky=EW)
+		# tkExtra.Balloon.set(self.probeYdir, _("Probe along Y direction"))
+		# self.addWidget(self.probeYdir)
+		#
+		# col += 1
+		# self.probeZdir = tkExtra.FloatEntry(lframe(), background="White")
+		# self.probeZdir.grid(row=row, column=col, sticky=EW)
+		# tkExtra.Balloon.set(self.probeZdir, _("Probe along Z direction"))
+		# self.addWidget(self.probeZdir)
+
+		lframe().grid_columnconfigure(1,weight=1)
+		lframe().grid_columnconfigure(2,weight=1)
+
+		frame2 = Frame(lframe, pady = 5)
+		frame2.pack(side=TOP, fill=X)
+		# ---
+		row = 0
+		col = 0
+		b = Button(frame2, #"<<Probe>>",
+				image=Utils.icons["probe32"],
+				text=_("Z Probe"),
+				compound=LEFT,
+				command=self.zProbe,
 #				width=48,
 				padx=5, pady=0)
 		b.grid(row=row, column=col, padx=1, sticky=EW)
 		self.addWidget(b)
-		tkExtra.Balloon.set(b, _("Perform a single probe cycle"))
+		tkExtra.Balloon.set(b, _("Perform single Z probe cycle"))
 
+		col += 1
+		b = Button(frame2,  # "<<Probe>>",
+				   image=Utils.icons["origin32"],
+				   text=_("XYZ Probe"),
+				   compound=LEFT,
+				   command=self.xyzProbe,
+				   #				width=48,
+				   padx=5, pady=0)
+		b.grid(row=row, column=col, padx=1, sticky=EW)
+		self.addWidget(b)
+		tkExtra.Balloon.set(b, _("Perform XYZ probe cycle"))
 
-		lframe().grid_columnconfigure(1,weight=1)
-		lframe().grid_columnconfigure(2,weight=1)
-		lframe().grid_columnconfigure(3,weight=1)
+		frame2.grid_columnconfigure(0, weight=1)
+		frame2.grid_columnconfigure(1, weight=1)
+
 
 		#----------------------------------------------------------------
 		# Center probing
 		#----------------------------------------------------------------
-		lframe = tkExtra.ExLabelFrame(self, text=_("Center"), foreground="DarkBlue")
-		lframe.pack(side=TOP, expand=YES, fill=X)
-
-		Label(lframe(), text=_("Diameter:")).pack(side=LEFT)
-		self.diameter = tkExtra.FloatEntry(lframe(), background="White")
-		self.diameter.pack(side=LEFT, expand=YES, fill=X)
-		tkExtra.Balloon.set(self.diameter, _("Probing ring internal diameter"))
-		self.addWidget(self.diameter)
-
-		# ---
-		b = Button(lframe(),
-				image=Utils.icons["target32"],
-				text=_("Center"),
-				compound=TOP,
-				command=self.probeCenter,
-				width=48,
-				padx=5, pady=0)
-		b.pack(side=RIGHT)
-		self.addWidget(b)
-		tkExtra.Balloon.set(b, _("Center probing using a ring"))
+		# lframe = tkExtra.ExLabelFrame(self, text=_("Center"), foreground="DarkBlue")
+		# lframe.pack(side=TOP, expand=YES, fill=X)
+		#
+		# Label(lframe(), text=_("Diameter:")).pack(side=LEFT)
+		# self.diameter = tkExtra.FloatEntry(lframe(), background="White")
+		# self.diameter.pack(side=LEFT, expand=YES, fill=X)
+		# tkExtra.Balloon.set(self.diameter, _("Probing ring internal diameter"))
+		# self.addWidget(self.diameter)
+		#
+		# # ---
+		# b = Button(lframe(),
+		# 		image=Utils.icons["target32"],
+		# 		text=_("Center"),
+		# 		compound=TOP,
+		# 		command=self.probeCenter,
+		# 		width=48,
+		# 		padx=5, pady=0)
+		# b.pack(side=RIGHT)
+		# self.addWidget(b)
+		# tkExtra.Balloon.set(b, _("Center probing using a ring"))
 
 		#----------------------------------------------------------------
 		# Align / Orient / Square ?
 		#----------------------------------------------------------------
-		lframe = tkExtra.ExLabelFrame(self, text=_("Orient"), foreground="DarkBlue")
-		lframe.pack(side=TOP, expand=YES, fill=X)
-
-		# ---
-		row, col = 0,0
-
-		Label(lframe(), text=_("Markers:")).grid(row=row, column=col, sticky=E)
-		col += 1
-
-		self.scale_orient = Scale(lframe(),
-					from_=0, to_=0,
-					orient=HORIZONTAL,
-					showvalue=1,
-					state=DISABLED,
-					command=self.changeMarker)
-		self.scale_orient.grid(row=row, column=col, columnspan=2, sticky=EW)
-		tkExtra.Balloon.set(self.scale_orient, _("Select orientation marker"))
-
-		# Add new point
-		col += 2
-		b = Button(lframe(), text=_("Add"),
-				image=Utils.icons["add"],
-				compound=LEFT,
-				command=lambda s=self: s.event_generate("<<AddMarker>>"),
-				padx = 1,
-				pady = 1)
-		b.grid(row=row, column=col, sticky=NSEW)
-		self.addWidget(b)
-		tkExtra.Balloon.set(b, _("Add an orientation marker. " \
-				"Jog first the machine to the marker position " \
-				"and then click on canvas to add the marker."))
-
-		# ----
-		row += 1
-		col = 0
-		Label(lframe(), text=_("Gcode:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.x_orient = tkExtra.FloatEntry(lframe(), background="White")
-		self.x_orient.grid(row=row, column=col, sticky=EW)
-		self.x_orient.bind("<FocusOut>", self.orientUpdate)
-		self.x_orient.bind("<Return>",   self.orientUpdate)
-		self.x_orient.bind("<KP_Enter>", self.orientUpdate)
-		tkExtra.Balloon.set(self.x_orient, _("GCode X coordinate of orientation point"))
-
-		col += 1
-		self.y_orient = tkExtra.FloatEntry(lframe(), background="White")
-		self.y_orient.grid(row=row, column=col, sticky=EW)
-		self.y_orient.bind("<FocusOut>", self.orientUpdate)
-		self.y_orient.bind("<Return>",   self.orientUpdate)
-		self.y_orient.bind("<KP_Enter>", self.orientUpdate)
-		tkExtra.Balloon.set(self.y_orient, _("GCode Y coordinate of orientation point"))
-
-		# Buttons
-		col += 1
-		b = Button(lframe(), text=_("Delete"),
-				image=Utils.icons["x"],
-				compound=LEFT,
-				command = self.orientDelete,
-				padx = 1,
-				pady = 1)
-		b.grid(row=row, column=col, sticky=EW)
-		self.addWidget(b)
-		tkExtra.Balloon.set(b, _("Delete current marker"))
-
-		# ---
-		row += 1
-		col = 0
-
-		Label(lframe(), text=_("WPos:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.xm_orient = tkExtra.FloatEntry(lframe(), background="White")
-		self.xm_orient.grid(row=row, column=col, sticky=EW)
-		self.xm_orient.bind("<FocusOut>", self.orientUpdate)
-		self.xm_orient.bind("<Return>",   self.orientUpdate)
-		self.xm_orient.bind("<KP_Enter>", self.orientUpdate)
-		tkExtra.Balloon.set(self.xm_orient, _("Machine X coordinate of orientation point"))
-
-		col += 1
-		self.ym_orient = tkExtra.FloatEntry(lframe(), background="White")
-		self.ym_orient.grid(row=row, column=col, sticky=EW)
-		self.ym_orient.bind("<FocusOut>", self.orientUpdate)
-		self.ym_orient.bind("<Return>",   self.orientUpdate)
-		self.ym_orient.bind("<KP_Enter>", self.orientUpdate)
-		tkExtra.Balloon.set(self.ym_orient, _("Machine Y coordinate of orientation point"))
-
-		# Buttons
-		col += 1
-		b = Button(lframe(), text=_("Clear"),
-				image=Utils.icons["clear"],
-				compound=LEFT,
-				command = self.orientClear,
-				padx = 1,
-				pady = 1)
-		b.grid(row=row, column=col, sticky=EW)
-		self.addWidget(b)
-		tkExtra.Balloon.set(b, _("Delete all markers"))
-
-		# ---
-		row += 1
-		col = 0
-		Label(lframe(), text=_("Angle:")).grid(row=row, column=col, sticky=E)
-
-		col += 1
-		self.angle_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
-		self.angle_orient.grid(row=row, column=col, columnspan=2, sticky=EW, padx=1, pady=1)
-
-		# Buttons
-		col += 2
-		b = Button(lframe(), text=_("Orient"),
-				image=Utils.icons["setsquare32"],
-				compound=TOP,
-				command = lambda a=app:a.insertCommand("ORIENT",True),
-				padx = 1,
-				pady = 1)
-		b.grid(row=row, rowspan=3, column=col, sticky=EW)
-		self.addWidget(b)
-		tkExtra.Balloon.set(b, _("Align GCode with the machine markers"))
-
-		# ---
-		row += 1
-		col = 0
-		Label(lframe(), text=_("Offset:")).grid(row=row, column=col, sticky=E)
-
-		col += 1
-		self.xo_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
-		self.xo_orient.grid(row=row, column=col, sticky=EW, padx=1)
-
-		col += 1
-		self.yo_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
-		self.yo_orient.grid(row=row, column=col, sticky=EW, padx=1)
-
-		# ---
-		row += 1
-		col = 0
-		Label(lframe(), text=_("Error:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.err_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
-		self.err_orient.grid(row=row, column=col, columnspan=2, sticky=EW, padx=1, pady=1)
-
-		lframe().grid_columnconfigure(1, weight=1)
-		lframe().grid_columnconfigure(2, weight=1)
+		# lframe = tkExtra.ExLabelFrame(self, text=_("Orient"), foreground="DarkBlue")
+		# lframe.pack(side=TOP, expand=YES, fill=X)
+		#
+		# # ---
+		# row, col = 0,0
+		#
+		# Label(lframe(), text=_("Markers:")).grid(row=row, column=col, sticky=E)
+		# col += 1
+		#
+		# self.scale_orient = Scale(lframe(),
+		# 			from_=0, to_=0,
+		# 			orient=HORIZONTAL,
+		# 			showvalue=1,
+		# 			state=DISABLED,
+		# 			command=self.changeMarker)
+		# self.scale_orient.grid(row=row, column=col, columnspan=2, sticky=EW)
+		# tkExtra.Balloon.set(self.scale_orient, _("Select orientation marker"))
+		#
+		# # Add new point
+		# col += 2
+		# b = Button(lframe(), text=_("Add"),
+		# 		image=Utils.icons["add"],
+		# 		compound=LEFT,
+		# 		command=lambda s=self: s.event_generate("<<AddMarker>>"),
+		# 		padx = 1,
+		# 		pady = 1)
+		# b.grid(row=row, column=col, sticky=NSEW)
+		# self.addWidget(b)
+		# tkExtra.Balloon.set(b, _("Add an orientation marker. " \
+		# 		"Jog first the machine to the marker position " \
+		# 		"and then click on canvas to add the marker."))
+		#
+		# # ----
+		# row += 1
+		# col = 0
+		# Label(lframe(), text=_("Gcode:")).grid(row=row, column=col, sticky=E)
+		# col += 1
+		# self.x_orient = tkExtra.FloatEntry(lframe(), background="White")
+		# self.x_orient.grid(row=row, column=col, sticky=EW)
+		# self.x_orient.bind("<FocusOut>", self.orientUpdate)
+		# self.x_orient.bind("<Return>",   self.orientUpdate)
+		# self.x_orient.bind("<KP_Enter>", self.orientUpdate)
+		# tkExtra.Balloon.set(self.x_orient, _("GCode X coordinate of orientation point"))
+		#
+		# col += 1
+		# self.y_orient = tkExtra.FloatEntry(lframe(), background="White")
+		# self.y_orient.grid(row=row, column=col, sticky=EW)
+		# self.y_orient.bind("<FocusOut>", self.orientUpdate)
+		# self.y_orient.bind("<Return>",   self.orientUpdate)
+		# self.y_orient.bind("<KP_Enter>", self.orientUpdate)
+		# tkExtra.Balloon.set(self.y_orient, _("GCode Y coordinate of orientation point"))
+		#
+		# # Buttons
+		# col += 1
+		# b = Button(lframe(), text=_("Delete"),
+		# 		image=Utils.icons["x"],
+		# 		compound=LEFT,
+		# 		command = self.orientDelete,
+		# 		padx = 1,
+		# 		pady = 1)
+		# b.grid(row=row, column=col, sticky=EW)
+		# self.addWidget(b)
+		# tkExtra.Balloon.set(b, _("Delete current marker"))
+		#
+		# # ---
+		# row += 1
+		# col = 0
+		#
+		# Label(lframe(), text=_("WPos:")).grid(row=row, column=col, sticky=E)
+		# col += 1
+		# self.xm_orient = tkExtra.FloatEntry(lframe(), background="White")
+		# self.xm_orient.grid(row=row, column=col, sticky=EW)
+		# self.xm_orient.bind("<FocusOut>", self.orientUpdate)
+		# self.xm_orient.bind("<Return>",   self.orientUpdate)
+		# self.xm_orient.bind("<KP_Enter>", self.orientUpdate)
+		# tkExtra.Balloon.set(self.xm_orient, _("Machine X coordinate of orientation point"))
+		#
+		# col += 1
+		# self.ym_orient = tkExtra.FloatEntry(lframe(), background="White")
+		# self.ym_orient.grid(row=row, column=col, sticky=EW)
+		# self.ym_orient.bind("<FocusOut>", self.orientUpdate)
+		# self.ym_orient.bind("<Return>",   self.orientUpdate)
+		# self.ym_orient.bind("<KP_Enter>", self.orientUpdate)
+		# tkExtra.Balloon.set(self.ym_orient, _("Machine Y coordinate of orientation point"))
+		#
+		# # Buttons
+		# col += 1
+		# b = Button(lframe(), text=_("Clear"),
+		# 		image=Utils.icons["clear"],
+		# 		compound=LEFT,
+		# 		command = self.orientClear,
+		# 		padx = 1,
+		# 		pady = 1)
+		# b.grid(row=row, column=col, sticky=EW)
+		# self.addWidget(b)
+		# tkExtra.Balloon.set(b, _("Delete all markers"))
+		#
+		# # ---
+		# row += 1
+		# col = 0
+		# Label(lframe(), text=_("Angle:")).grid(row=row, column=col, sticky=E)
+		#
+		# col += 1
+		# self.angle_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
+		# self.angle_orient.grid(row=row, column=col, columnspan=2, sticky=EW, padx=1, pady=1)
+		#
+		# # Buttons
+		# col += 2
+		# b = Button(lframe(), text=_("Orient"),
+		# 		image=Utils.icons["setsquare32"],
+		# 		compound=TOP,
+		# 		command = lambda a=app:a.insertCommand("ORIENT",True),
+		# 		padx = 1,
+		# 		pady = 1)
+		# b.grid(row=row, rowspan=3, column=col, sticky=EW)
+		# self.addWidget(b)
+		# tkExtra.Balloon.set(b, _("Align GCode with the machine markers"))
+		#
+		# # ---
+		# row += 1
+		# col = 0
+		# Label(lframe(), text=_("Offset:")).grid(row=row, column=col, sticky=E)
+		#
+		# col += 1
+		# self.xo_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
+		# self.xo_orient.grid(row=row, column=col, sticky=EW, padx=1)
+		#
+		# col += 1
+		# self.yo_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
+		# self.yo_orient.grid(row=row, column=col, sticky=EW, padx=1)
+		#
+		# # ---
+		# row += 1
+		# col = 0
+		# Label(lframe(), text=_("Error:")).grid(row=row, column=col, sticky=E)
+		# col += 1
+		# self.err_orient = Label(lframe(), foreground="DarkBlue", background="gray90", anchor=W)
+		# self.err_orient.grid(row=row, column=col, columnspan=2, sticky=EW, padx=1, pady=1)
+		#
+		# lframe().grid_columnconfigure(1, weight=1)
+		# lframe().grid_columnconfigure(2, weight=1)
 
 		#----------------------------------------------------------------
 		self.warn = True
 		self.loadConfig()
 
+	#----------------------------------------------------------------------
+	def ancherChange(self, a=None, b=None, c=None):
+		selectedAncher = self.selectedAncher.get().lower()
+		self._ankerX["text"] = Utils.getStr("Probe", selectedAncher + "x")
+		self._ankerY["text"] = Utils.getStr("Probe", selectedAncher + "y")
+
 	#-----------------------------------------------------------------------
 	def loadConfig(self):
-		self.probeXdir.set(Utils.getStr("Probe", "x"))
-		self.probeYdir.set(Utils.getStr("Probe", "y"))
-		self.probeZdir.set(Utils.getStr("Probe", "z"))
-		self.diameter.set(Utils.getStr("Probe",  "center"))
+		# self.probeXdir.set(Utils.getStr("Probe", "x"))
+		# self.probeYdir.set(Utils.getStr("Probe", "y"))
+		# self.probeZdir.set(Utils.getStr("Probe", "z"))
+		#self.diameter.set(Utils.getStr("Probe",  "center"))
 		self.warn = Utils.getBool("Warning", "probe", self.warn)
 
 	#-----------------------------------------------------------------------
 	def saveConfig(self):
-		Utils.setFloat("Probe", "x",      self.probeXdir.get())
-		Utils.setFloat("Probe", "y",      self.probeYdir.get())
-		Utils.setFloat("Probe", "z",      self.probeZdir.get())
-		Utils.setFloat("Probe", "center", self.diameter.get())
+		# Utils.setFloat("Probe", "x",      self.probeXdir.get())
+		# Utils.setFloat("Probe", "y",      self.probeYdir.get())
+		# Utils.setFloat("Probe", "z",      self.probeZdir.get())
+		#Utils.setFloat("Probe", "center", self.diameter.get())
 		Utils.setBool("Warning","probe",  self.warn)
 
 	#-----------------------------------------------------------------------
@@ -760,11 +791,58 @@ class ProbeFrame(CNCRibbon.PageFrame):
 					_("At least one probe direction should be specified"))
 
 	#-----------------------------------------------------------------------
+	# Probe one Point
+	#-----------------------------------------------------------------------
+	def xyzProbe(self, event=None):
+		pass
+
+	#-----------------------------------------------------------------------
+	# Probe one Point
+	#-----------------------------------------------------------------------
+	def zProbe(self, event=None):
+
+		if ProbeCommonFrame.probeUpdate():
+			tkMessageBox.showerror(_("Probe Error"),
+				_("Invalid probe feed rate"),
+				parent=self.winfo_toplevel())
+			return
+		self.warnMessage()
+
+		cmd = str(CNC.vars["prbcmd"])
+		ok = False
+
+		v = self.probeXdir.get()
+		if v != "":
+			cmd += "X"+str(v)
+			ok = True
+
+		v = self.probeYdir.get()
+		if v != "":
+			cmd += "Y"+str(v)
+			ok = True
+
+		v = self.probeZdir.get()
+		if v != "":
+			cmd += "Z"+str(v)
+			ok = True
+
+		v = ProbeCommonFrame.probeFeed.get()
+		if v != "":
+			cmd += "F"+str(v)
+
+		if ok:
+			self.sendGCode(cmd)
+		else:
+			tkMessageBox.showerror(_("Probe Error"),
+					_("At least one probe direction should be specified"))
+
+	#-----------------------------------------------------------------------
 	# Rapid move to the last probed location
 	#-----------------------------------------------------------------------
-	def goto2Probe(self, event=None):
+	def gotoAncher(self, event=None):
 		try:
-			cmd = "G53 G0 X%g Y%g Z%g\n"%(CNC.vars["prbx"], CNC.vars["prby"], CNC.vars["prbz"])
+			selectedAncher = self.selectedAncher.get().lower()
+			cmd = "G53 G0 X%g Y%g Z%g\n"%(CNC.vars[selectedAncher + "x"], CNC.vars[selectedAncher + "y"])
 		except:
 			return
 		self.sendGCode(cmd)
@@ -2719,7 +2797,7 @@ class ProbePage(CNCRibbon.Page):
 	#-----------------------------------------------------------------------
 	def register(self):
 		self._register((ProbeTabGroup, AutolevelGroup, CameraGroup, ToolGroup),
-			(ProbeCommonFrame, ProbeFrame, AutolevelFrame, CameraFrame, ToolFrame, ATCFrame))
+			(ProbeCommonFrame, ProbeFrame, AutolevelFrame, ToolFrame, ATCFrame))
 
 		self.tabGroup = CNCRibbon.Page.groups["Probe"]
 		self.tabGroup.tab.set("Probe")

@@ -834,6 +834,49 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		frame.grid_columnconfigure(3, weight=1)
 		frame.grid_columnconfigure(4, weight=1)
 
+		#--------------------------------------------------------
+		frame2 = Frame(self())
+		frame2.pack(side=TOP, fill=X, pady=5)
+
+		row = 0
+		col = 0
+		self.xzero = Button(frame2, text=_("X=0"),
+				command=self.setX0,
+				image=Utils.icons["origin"],
+				height=20,
+				compound=LEFT,
+				activebackground="LightYellow")
+		self.xzero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.xzero, _("Set X coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.xzero)
+
+		col += 1
+		self.yzero = Button(frame2, text=_("Y=0"),
+				command=self.setY0,
+				image=Utils.icons["origin"],
+				height=20,
+				compound=LEFT,
+				activebackground="LightYellow")
+		self.yzero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.yzero, _("Set Y coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.yzero)
+
+		col += 1
+		self.zzero = Button(frame2, text=_("Z=0"),
+				command=self.setZ0,
+				image=Utils.icons["origin"],
+				height=20,
+				compound=LEFT,
+				activebackground="LightYellow")
+		self.zzero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.zzero, _("Set Z coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.zzero)
+
+		frame2.grid_columnconfigure(0, weight=1)
+		frame2.grid_columnconfigure(1, weight=1)
+		frame2.grid_columnconfigure(2, weight=1)
+
+
 
 		#self.grid_columnconfigure(6,weight=1)
 		try:
@@ -841,6 +884,42 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 			self.tk.call("grid","anchor",self,CENTER)
 		except TclError:
 			pass
+	#----------------------------------------------------------------------
+	def setX0(self, event=None):
+		self._wcsSet("0",None,None)
+
+	#----------------------------------------------------------------------
+	def setY0(self, event=None):
+		self._wcsSet(None,"0",None)
+
+	#----------------------------------------------------------------------
+	def setZ0(self, event=None):
+		self._wcsSet(None,None,"0")
+
+	#----------------------------------------------------------------------
+	def _wcsSet(self, x, y, z):
+		global wcsvar
+		p = wcsvar.get()
+		if p<6:
+			cmd = "G10L20P%d"%(p+1)
+		elif p==6:
+			cmd = "G28.1"
+		elif p==7:
+			cmd = "G30.1"
+		elif p==8:
+			cmd = "G92"
+
+		pos = ""
+		if x is not None: pos += "X"+str(x)
+		if y is not None: pos += "Y"+str(y)
+		if z is not None: pos += "Z"+str(z)
+		cmd += pos
+		self.sendGCode(cmd)
+		self.sendGCode("$#")
+		self.event_generate("<<Status>>",
+			data=(_("Set workspace %s to %s")%(WCS[p],pos)))
+			#data=(_("Set workspace %s to %s")%(WCS[p],pos)).encode("utf8"))
+		self.event_generate("<<CanvasFocus>>")
 
 	#----------------------------------------------------------------------
 	def saveConfig(self):
