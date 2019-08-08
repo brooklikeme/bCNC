@@ -2482,13 +2482,13 @@ class ATCFrame(CNCRibbon.PageFrame):
 			# enable tool rack
 			self.toolrack.enableToolRack()
 			time.sleep(1)
-			self.app.home()
+			#self.app.home()
 			self.btn_text.set("Disable Tool Rack")
 		else:
 			# disable tool rack
 			self.toolrack.disableToolRack()
 			time.sleep(1)
-			self.app.home()
+			#self.app.home()
 			self.btn_text.set("Enable Tool Rack")
 
 	# -----------------------------------------------------------------------
