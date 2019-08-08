@@ -571,11 +571,15 @@ class TabRibbonFrame(Frame):
 							   background=_BACKGROUND)
 		self._tabFrame.pack(side=LEFT, fill=Y)
 
+		Label(frame, image=Utils.icons["sep"], background=_BACKGROUND_DISABLE).pack(side=LEFT, fill=Y)
+
 		# ==== Ribbon Frame ====
 		self._ribbonFrame = Frame(frame,
 						background=_BACKGROUND,
-						relief=RAISED, padx = 20)
+						relief=RAISED, padx = 5)
 		self._ribbonFrame.pack(side=LEFT, fill=Y)
+
+		Label(frame, image=Utils.icons["sep"], background=_BACKGROUND_DISABLE).pack(side=LEFT, fill=Y)
 
 		# --- Top DroBar ---
 		self._topdroFrame = Frame(frame,
