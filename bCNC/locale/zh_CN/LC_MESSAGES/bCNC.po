@@ -674,7 +674,7 @@ msgstr "刪除选定的操作/对象"
 
 #: bCNC/ToolsPage.py:1257
 msgid "CAM"
-msgstr "计算机辅助加工"
+msgstr "配置"
 
 #: bCNC/ToolsPage.py:1264 bCNC/EditorPage.py:48 bCNC/plugins/box.py:317
 msgid "Cut"
@@ -802,7 +802,7 @@ msgstr "G代码操作刀具和用户插件"
 
 #: bCNC/ToolsPage.py:1728
 msgid "Tools"
-msgstr "工具"
+msgstr "刀具"
 
 #: bCNC/Utils.py:463
 msgid "Error Reporting"

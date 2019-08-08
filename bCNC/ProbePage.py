@@ -103,17 +103,17 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 		tkExtra.Balloon.set(b, _("Autolevel Z surface"))
 
 		# ---
-		col += 1
-		b = Ribbon.LabelRadiobutton(self.frame,
-				image=Utils.icons["camera32"],
-				text=_("Camera"),
-				compound=TOP,
-				variable=self.tab,
-				value="Camera",
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=5, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Work surface camera view and alignment"))
-		if Camera.cv is None: b.config(state=DISABLED)
+		# col += 1
+		# b = Ribbon.LabelRadiobutton(self.frame,
+		# 		image=Utils.icons["camera32"],
+		# 		text=_("Camera"),
+		# 		compound=TOP,
+		# 		variable=self.tab,
+		# 		value="Camera",
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, padx=5, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Work surface camera view and alignment"))
+		# if Camera.cv is None: b.config(state=DISABLED)
 
 		# ---
 		col += 1
@@ -135,7 +135,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 #===============================================================================
 class AutolevelGroup(CNCRibbon.ButtonGroup):
 	def __init__(self, master, app):
-		CNCRibbon.ButtonGroup.__init__(self, master, "Probe:Autolevel", app)
+		CNCRibbon.ButtonGroup.__init__(self, master, "Probe1:Autolevel", app)
 		self.label["background"] = Ribbon._BACKGROUND_GROUP2
 		self.grid3rows()
 
@@ -1114,14 +1114,23 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 		tkExtra.Balloon.set(self.probeXstep, _("X step"))
 
 		col += 1
-		self.probeXbins = Spinbox(lframe,
-					from_=2, to_=1000,
-					command=self.draw,
-					background="White",
-					width=3)
+		self.selectedXSteps = StringVar()
+		self.selectedXSteps.set("5")
+		self.selectedXSteps.trace("w", self.draw)
+		self.probeXbins = OptionMenu(lframe, self.selectedXSteps, *["5", "10", "15", "20"])
+		self.probeXbins.config(padx=0, pady=1)
 		self.probeXbins.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.probeXbins, _("X bins"))
+		tkExtra.Balloon.set(self.probeXbins, _("Step for X and Y move operation"))
 		self.addWidget(self.probeXbins)
+
+		# self.probeXbins = Spinbox(lframe,
+		# 			from_=2, to_=1000,
+		# 			command=self.draw,
+		# 			background="White",
+		# 			width=3)
+		# self.probeXbins.grid(row=row, column=col, sticky=EW)
+		# tkExtra.Balloon.set(self.probeXbins, _("X bins"))
+		# self.addWidget(self.probeXbins)
 
 		# --- Y ---
 		row += 1
@@ -1146,14 +1155,23 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 		tkExtra.Balloon.set(self.probeYstep, _("Y step"))
 
 		col += 1
-		self.probeYbins = Spinbox(lframe,
-					from_=2, to_=1000,
-					command=self.draw,
-					background="White",
-					width=3)
+		self.selectedYSteps = StringVar()
+		self.selectedYSteps.set("5")
+		self.selectedYSteps.trace("w", self.draw)
+		self.probeYbins = OptionMenu(lframe, self.selectedYSteps, *["5", "10", "15", "20"])
+		self.probeYbins.config(padx=0, pady=1)
 		self.probeYbins.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.probeYbins, _("Y bins"))
+		tkExtra.Balloon.set(self.probeYbins, _("Step for X and Y move operation"))
 		self.addWidget(self.probeYbins)
+
+		# self.probeYbins = Spinbox(lframe,
+		# 			from_=2, to_=1000,
+		# 			command=self.draw,
+		# 			background="White",
+		# 			width=3)
+		# self.probeYbins.grid(row=row, column=col, sticky=EW)
+		# tkExtra.Balloon.set(self.probeYbins, _("Y bins"))
+		# self.addWidget(self.probeYbins)
 
 		# Max Z
 		row += 1
@@ -1175,6 +1193,68 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 		lframe.grid_columnconfigure(1,weight=2)
 		lframe.grid_columnconfigure(2,weight=2)
 		lframe.grid_columnconfigure(3,weight=1)
+
+		frame2 = Frame(self)
+		frame2.pack(side=BOTTOM, fill=X, pady=5)
+		col = 0
+		row = 0
+		height=25
+
+		b = Button(frame2,
+				command=self.getMargins,
+				image=Utils.icons["margins"],
+				text=_("Margins"),
+				compound=LEFT,
+				height=height,
+				background=Ribbon._BACKGROUND)
+		b.grid(row=row, column=col, padx=0, pady=0, sticky=EW)
+		tkExtra.Balloon.set(b, _("Get margins from gcode file"))
+		self.addWidget(b)
+
+		# ---
+		col += 1
+		b = Button(frame2,
+				command=self.setZero,
+				image=Utils.icons["origin"],
+				text=_("Zero"),
+				compound=LEFT,
+				   height=height,
+				background=Ribbon._BACKGROUND)
+		b.grid(row=row, column=col, padx=0, pady=0, sticky=EW)
+		tkExtra.Balloon.set(b, _("Set current XY location as autoleveling Z-zero (recalculate probed data to be relative to this XY origin point)"))
+		self.addWidget(b)
+
+		# ---
+		col += 1
+		b = Button(frame2,
+				command = self.clear,
+				image=Utils.icons["clear"],
+				text=_("Clear"),
+				compound=LEFT,
+				   height=height,
+				background=Ribbon._BACKGROUND)
+		b.grid(row=row, column=col, padx=0, pady=0, sticky=EW)
+		tkExtra.Balloon.set(b, _("Clear probe data"))
+		self.addWidget(b)
+
+		# ---
+		row+=1
+		col = 0
+		b = Button(frame2,
+				command=self.scan,
+				image=Utils.icons["gear"],
+				text=_("Scan"),
+				compound=LEFT,
+				height=height,
+				background=Ribbon._BACKGROUND)
+		b.grid(row=row, column=col, columnspan=3, padx=0, pady=0, sticky=EW)
+		self.addWidget(b)
+		tkExtra.Balloon.set(b, _("Scan probed area for level information on Z plane"))
+
+		frame2.grid_columnconfigure(0,weight=1)
+		frame2.grid_columnconfigure(1,weight=1)
+		frame2.grid_columnconfigure(2,weight=1)
+
 
 		self.loadConfig()
 
@@ -1200,10 +1280,10 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 	def saveConfig(self):
 		Utils.setFloat("Probe", "xmin", self.probeXmin.get())
 		Utils.setFloat("Probe", "xmax", self.probeXmax.get())
-		Utils.setInt(  "Probe", "xn",   self.probeXbins.get())
+		Utils.setInt(  "Probe", "xn",   self.selectedXSteps.get())
 		Utils.setFloat("Probe", "ymin", self.probeYmin.get())
 		Utils.setFloat("Probe", "ymax", self.probeYmax.get())
-		Utils.setInt(  "Probe", "yn",   self.probeYbins.get())
+		Utils.setInt(  "Probe", "yn",   self.selectedYSteps.get())
 		Utils.setFloat("Probe", "zmin", self.probeZmin.get())
 		Utils.setFloat("Probe", "zmax", self.probeZmax.get())
 
@@ -1216,11 +1296,9 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 		self.probeZmin.set(Utils.getFloat("Probe","zmin"))
 		self.probeZmax.set(Utils.getFloat("Probe","zmax"))
 
-		self.probeXbins.delete(0,END)
-		self.probeXbins.insert(0,max(2,Utils.getInt("Probe","xn",5)))
+		self.selectedXSteps.set(Utils.getInt("Probe","xn",5))
+		self.selectedYSteps.set(Utils.getInt("Probe","yn",5))
 
-		self.probeYbins.delete(0,END)
-		self.probeYbins.insert(0,max(2,Utils.getInt("Probe","yn",5)))
 		self.change(False)
 
 	#-----------------------------------------------------------------------
@@ -1238,7 +1316,7 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 		try:
 			probe.xmin = float(self.probeXmin.get())
 			probe.xmax = float(self.probeXmax.get())
-			probe.xn   = max(2,int(self.probeXbins.get()))
+			probe.xn   = int(self.selectedXSteps.get())
 			self.probeXstep["text"] = "%.5g"%(probe.xstep())
 		except ValueError:
 			self.probeXstep["text"] = ""
@@ -1258,7 +1336,7 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 		try:
 			probe.ymin = float(self.probeYmin.get())
 			probe.ymax = float(self.probeYmax.get())
-			probe.yn   = max(2,int(self.probeYbins.get()))
+			probe.yn   = int(self.selectedYSteps.get())
 			self.probeYstep["text"] = "%.5g"%(probe.ystep())
 		except ValueError:
 			self.probeYstep["text"] = ""
@@ -1302,7 +1380,7 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 		return error
 
 	#-----------------------------------------------------------------------
-	def draw(self):
+	def draw(self, a=None, b=None, c=None):
 		if not self.change():
 			self.event_generate("<<DrawProbe>>")
 
