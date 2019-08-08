@@ -574,8 +574,8 @@ class TabRibbonFrame(Frame):
 		# ==== Ribbon Frame ====
 		self._ribbonFrame = Frame(frame,
 						background=_BACKGROUND,
-						relief=RAISED)
-		self._ribbonFrame.pack(side=LEFT)
+						relief=RAISED, padx = 20)
+		self._ribbonFrame.pack(side=LEFT, fill=Y)
 
 		# --- Top DroBar ---
 		self._topdroFrame = Frame(frame,
