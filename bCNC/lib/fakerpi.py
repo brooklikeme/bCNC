@@ -18,7 +18,7 @@ class GPIO(object):
         print 'fake set mode!'
 
     @staticmethod
-    def setup(port, mode):
+    def setup(port, mode, initial):
         print 'fake setup!'
 
     @staticmethod
