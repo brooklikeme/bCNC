@@ -15,8 +15,8 @@ GPIO_TOOLRACK = 17
 GPIO_AIRPUMP  = 18
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(GPIO_TOOLRACK, GPIO.OUT, initial=GPIO.LOW) # GPIO Assign mode
-GPIO.setup(GPIO_AIRPUMP, GPIO.OUT, initial=GPIO.LOW) # GPIO Assign mode
+GPIO.setup(GPIO_TOOLRACK, GPIO.OUT, initial=GPIO.HIGH) # GPIO Assign mode
+GPIO.setup(GPIO_AIRPUMP, GPIO.OUT, initial=GPIO.HIGH) # GPIO Assign mode
 
 class ToolRack(object):
     def __init__(self):
@@ -32,9 +32,9 @@ class ToolRack(object):
 
     def openAirPump(self):
         print('AirPump opend!')
-        GPIO.output(GPIO_AIRPUMP, GPIO.HIGH)
+        GPIO.output(GPIO_AIRPUMP, GPIO.LOW)
 
     def closeAirPump(self):
         print('AirPump closed!')
-        GPIO.output(GPIO_AIRPUMP, GPIO.LOW)
+        GPIO.output(GPIO_AIRPUMP, GPIO.HIGH)
 
