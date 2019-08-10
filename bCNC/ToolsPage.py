@@ -1069,7 +1069,7 @@ class Tools:
 		# CNC should be first to load the inches
 		for cls in [ Camera, Config, Font, Color, Controller, Cut,
 			     Drill, EndMill, Events, Material, Pocket,
-			     Profile, Shortcut, Stock, Tabs]:
+			     Profile, Shortcut, Stock, Tabs, Probe]:
 			tool = cls(self)
 			self.addTool(tool)
 
@@ -1279,6 +1279,31 @@ class DataBaseGroup(CNCRibbon.ButtonGroup):
 		self.addWidget(b)
 		app.tools.addButton("delete",b)
 
+#==============================================================================
+# CNC Probe configuration
+#==============================================================================
+class Probe(_Base):
+	def __init__(self, master):
+		_Base.__init__(self, master)
+		self.name = "Probe"
+		self.variables = [
+			("fastfeed"      , "mm",   100. , _("Fast Probe Feed"))   ,
+			("feed"   ,        "mm",   10    , _("Probe Feed"))   ,
+			("tlo" ,           "mm",   0    , _("TLO"))   ,
+			("cmd",            "G38.2,G38.3,G38.4,G38.5", "G38.2", _("Probe Command")),
+			("z", 			   "mm", -10, 	_("Z Probe Position")),
+		]
+
+	# ----------------------------------------------------------------------
+	# Update variables after edit command
+	# ----------------------------------------------------------------------
+	def update(self):
+		CNC.vars["fastprbfeed"] = float(self["fastfeed"])
+		CNC.vars["prbfeed"] = float(self["feed"])
+		CNC.vars["prbcmd"] = str(self["cmd"])
+		Utils.setFloat("Probe", "z", float(self["z"]))
+		return False
+
 
 #===============================================================================
 # CAM Group
@@ -1485,112 +1510,114 @@ class CAMGroup(CNCRibbon.ButtonMenuGroup):
 #===============================================================================
 # Config
 #===============================================================================
-class ConfigGroup(CNCRibbon.ButtonMenuGroup):
+class ConfigGroup(CNCRibbon.ButtonGroup):
 	def __init__(self, master, app):
 		#CNCRibbon.ButtonGroup.__init__(self, master, N_("Config"), app)
-		CNCRibbon.ButtonMenuGroup.__init__(self, master, N_("Config"), app)
-		self.grid3rows()
+		CNCRibbon.ButtonGroup.__init__(self, master, N_("Config"), app)
+
+
+		# b = Label(f, image=Utils.icons["globe"], background=Ribbon._BACKGROUND)
+		# b.pack(side=LEFT)
+		#
+		# self.language = Ribbon.LabelCombobox(f,
+		# 		command=self.languageChange,
+		# 		width=16)
+		# self.language.pack(side=RIGHT, fill=X, expand=YES)
+		# tkExtra.Balloon.set(self.language, _("Change program language restart is required"))
+		# self.addWidget(self.language)
+
+		# self.fillLanguage()
 
 		# ===
-		col,row=0,0
-		f = Frame(self.frame)
-		f.grid(row=row, column=col, columnspan=3, padx=0, pady=0, sticky=NSEW)
-
-		b = Label(f, image=Utils.icons["globe"], background=Ribbon._BACKGROUND)
-		b.pack(side=LEFT)
-
-		self.language = Ribbon.LabelCombobox(f,
-				command=self.languageChange,
-				width=16)
-		self.language.pack(side=RIGHT, fill=X, expand=YES)
-		tkExtra.Balloon.set(self.language, _("Change program language restart is required"))
-		self.addWidget(self.language)
-
-		self.fillLanguage()
-
-		# ===
-		row += 1
-		b = Ribbon.LabelRadiobutton(self.frame,
-				image=Utils.icons["camera"],
-				text=_("Camera"),
-				compound=LEFT,
-				anchor=W,
-				variable=app.tools.active,
-				value="Camera",
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Camera Configuration"))
-		self.addWidget(b)
-
-		# ---
-		row += 1
-		b = Ribbon.LabelRadiobutton(self.frame,
-				image=Utils.icons["color"],
-				text=_("Colors"),
-				compound=LEFT,
-				anchor=W,
-				variable=app.tools.active,
-				value="Color",
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Color configuration"))
-		self.addWidget(b)
+		# b = Ribbon.LabelRadiobutton(self.frame,
+		# 		image=Utils.icons["camera"],
+		# 		text=_("Camera"),
+		# 		compound=LEFT,
+		# 		anchor=W,
+		# 		variable=app.tools.active,
+		# 		value="Camera",
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Camera Configuration"))
+		# self.addWidget(b)
+		#
+		# # ---
+		# row += 1
+		# b = Ribbon.LabelRadiobutton(self.frame,
+		# 		image=Utils.icons["color"],
+		# 		text=_("Colors"),
+		# 		compound=LEFT,
+		# 		anchor=W,
+		# 		variable=app.tools.active,
+		# 		value="Color",
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Color configuration"))
+		# self.addWidget(b)
 
 		# ===
-		col,row = col+1,1
 		b = Ribbon.LabelRadiobutton(self.frame,
-				image=Utils.icons["config"],
+				image=Utils.icons["config32"],
 				text=_("Config"),
-				compound=LEFT,
-				anchor=W,
+				compound=TOP,
 				variable=app.tools.active,
 				value="CNC",
 				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
+		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Machine configuration for bCNC"))
 		self.addWidget(b)
 
 		# ---
-		row += 1
 		b = Ribbon.LabelRadiobutton(self.frame,
-				image=Utils.icons["arduino"],
+				image=Utils.icons["gear32"],
 				text=_("Controller"),
-				compound=LEFT,
-				anchor=W,
+				compound=TOP,
 				variable=app.tools.active,
 				value="Controller",
 				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
+		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Controller (GRBL) configuration"))
 		self.addWidget(b)
 
-		# ===
-		col,row = col+1,1
 		b = Ribbon.LabelRadiobutton(self.frame,
-				image=Utils.icons["font"],
-				text=_("Fonts"),
-				compound=LEFT,
-				anchor=W,
+				image=Utils.icons["probe32"],
+				text=_("Probe"),
+				compound=TOP,
 				variable=app.tools.active,
-				value="Font",
+				value="Probe",
 				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Font configuration"))
+		b.pack(side=LEFT, fill=BOTH)
+		tkExtra.Balloon.set(b, _("Probe parameters configuration"))
 		self.addWidget(b)
 
-		# ---
-		row += 1
-		b = Ribbon.LabelRadiobutton(self.frame,
-				image=Utils.icons["shortcut"],
-				text=_("Shortcuts"),
-				compound=LEFT,
-				anchor=W,
-				variable=app.tools.active,
-				value="Shortcut",
-				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
-		tkExtra.Balloon.set(b, _("Shortcuts configuration"))
-		self.addWidget(b)
+
+		# ===
+		# col,row = col+1,1
+		# b = Ribbon.LabelRadiobutton(self.frame,
+		# 		image=Utils.icons["font"],
+		# 		text=_("Fonts"),
+		# 		compound=LEFT,
+		# 		anchor=W,
+		# 		variable=app.tools.active,
+		# 		value="Font",
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Font configuration"))
+		# self.addWidget(b)
+		#
+		# # ---
+		# row += 1
+		# b = Ribbon.LabelRadiobutton(self.frame,
+		# 		image=Utils.icons["shortcut"],
+		# 		text=_("Shortcuts"),
+		# 		compound=LEFT,
+		# 		anchor=W,
+		# 		variable=app.tools.active,
+		# 		value="Shortcut",
+		# 		background=Ribbon._BACKGROUND)
+		# b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
+		# tkExtra.Balloon.set(b, _("Shortcuts configuration"))
+		# self.addWidget(b)
 #
 #		# ---
 #		row += 1
@@ -1605,6 +1632,7 @@ class ConfigGroup(CNCRibbon.ButtonMenuGroup):
 #		b.grid(row=row, column=col, padx=1, pady=0, sticky=NSEW)
 #		tkExtra.Balloon.set(b, _("Events configuration"))
 #		self.addWidget(b)
+
 
 	#----------------------------------------------------------------------
 	def fillLanguage(self):
@@ -1701,6 +1729,7 @@ class ToolsFrame(CNCRibbon.PageFrame):
 		app.tools.active.trace('w',self.change)
 		self.change()
 
+
 	#----------------------------------------------------------------------
 	# Populate listbox with new values
 	#----------------------------------------------------------------------
@@ -1764,8 +1793,6 @@ class ToolsFrame(CNCRibbon.PageFrame):
 	#----------------------------------------------------------------------
 #	def selectTab(self, tabid):
 #
-
-
 #===============================================================================
 # Tools Page
 #===============================================================================
@@ -1779,13 +1806,14 @@ class ToolsPage(CNCRibbon.Page):
 	#----------------------------------------------------------------------
 	def register(self):
 		self._register(
-			(DataBaseGroup,
-			 CAMGroup,
+			(#DataBaseGroup,
+			#CAMGroup,
 			#GeneratorGroup,
 			#ArtisticGroup,
 			#MacrosGroup,
-			ConfigGroup),
+			ConfigGroup,),
 			(ToolsFrame,))
+
 
 	#----------------------------------------------------------------------
 	def edit(self, event=None):

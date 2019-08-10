@@ -516,7 +516,7 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 					background="White",
 					relief=FLAT,
 					borderwidth=0,
-					justify=RIGHT)
+					justify=RIGHT,)
 		self.xwork.grid(row=row,column=col,padx=1,sticky=EW)
 		tkExtra.Balloon.set(self.xwork, _("X work position (click to set)"))
 
@@ -526,7 +526,7 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 					background="White",
 					relief=FLAT,
 					borderwidth=0,
-					justify=RIGHT)
+					justify=RIGHT,)
 		self.ywork.grid(row=row,column=col,padx=1,sticky=EW)
 		tkExtra.Balloon.set(self.ywork, _("Y work position (click to set)"))
 
@@ -536,7 +536,7 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 					background="White",
 					relief=FLAT,
 					borderwidth=0,
-					justify=RIGHT)
+					justify=RIGHT,)
 		self.zwork.grid(row=row,column=col,padx=1,sticky=EW)
 		tkExtra.Balloon.set(self.zwork, _("Z work position (click to set)"))
 

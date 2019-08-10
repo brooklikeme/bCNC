@@ -79,7 +79,6 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 
 		self.tab = StringVar()
 		# ---
-		col,row=0,0
 		b = Ribbon.LabelRadiobutton(self.frame,
 				image=Utils.icons["probe32"],
 				text=_("Probe"),
@@ -87,11 +86,10 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				variable=self.tab,
 				value="Probe",
 				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=5, pady=0, sticky=NSEW)
+		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Simple probing along a direction"))
 
 		# ---
-		col += 1
 		b = Ribbon.LabelRadiobutton(self.frame,
 				image=Utils.icons["level32"],
 				text=_("Autolevel"),
@@ -99,7 +97,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				variable=self.tab,
 				value="Autolevel",
 				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=5, pady=0, sticky=NSEW)
+		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Autolevel Z surface"))
 
 		# ---
@@ -116,7 +114,6 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 		# if Camera.cv is None: b.config(state=DISABLED)
 
 		# ---
-		col += 1
 		b = Ribbon.LabelRadiobutton(self.frame,
 				image=Utils.icons["endmill32"],
 				text=_("Tool"),
@@ -124,7 +121,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				variable=self.tab,
 				value="Tool",
 				background=Ribbon._BACKGROUND)
-		b.grid(row=row, column=col, padx=5, pady=0, sticky=NSEW)
+		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Setup probing for manual tool change"))
 
 		self.frame.grid_rowconfigure(0, weight=1)
@@ -310,13 +307,14 @@ class ProbeCommonFrame(CNCRibbon.PageFrame):
 	#------------------------------------------------------------------------
 	@staticmethod
 	def probeUpdate():
-		try:
-			CNC.vars["fastprbfeed"] = float(ProbeCommonFrame.fastProbeFeed.get())
-			CNC.vars["prbfeed"]     = float(ProbeCommonFrame.probeFeed.get())
-			CNC.vars["prbcmd"]      = str(ProbeCommonFrame.probeCmd.get().split()[0])
-			return False
-		except:
-			return True
+		pass
+		# try:
+		# 	CNC.vars["fastprbfeed"] = float(ProbeCommonFrame.fastProbeFeed.get())
+		# 	CNC.vars["prbfeed"]     = float(ProbeCommonFrame.probeFeed.get())
+		# 	CNC.vars["prbcmd"]      = str(ProbeCommonFrame.probeCmd.get().split()[0])
+		# 	return False
+		# except:
+		# 	return True
 
 	#------------------------------------------------------------------------
 	def updateTlo(self):
@@ -331,21 +329,23 @@ class ProbeCommonFrame(CNCRibbon.PageFrame):
 
 	#-----------------------------------------------------------------------
 	def saveConfig(self):
-		Utils.setFloat("Probe", "fastfeed", ProbeCommonFrame.fastProbeFeed.get())
-		Utils.setFloat("Probe", "feed", ProbeCommonFrame.probeFeed.get())
-		Utils.setFloat("Probe", "tlo",  ProbeCommonFrame.tlo.get())
-		Utils.setFloat("Probe", "cmd",  ProbeCommonFrame.probeCmd.get().split()[0])
+		pass
+		# Utils.setFloat("Probe", "fastfeed", ProbeCommonFrame.fastProbeFeed.get())
+		# Utils.setFloat("Probe", "feed", ProbeCommonFrame.probeFeed.get())
+		# Utils.setFloat("Probe", "tlo",  ProbeCommonFrame.tlo.get())
+		# Utils.setFloat("Probe", "cmd",  ProbeCommonFrame.probeCmd.get().split()[0])
 
 	#-----------------------------------------------------------------------
 	def loadConfig(self):
-		ProbeCommonFrame.fastProbeFeed.set(Utils.getFloat("Probe","fastfeed"))
-		ProbeCommonFrame.probeFeed.set(Utils.getFloat("Probe","feed"))
-		ProbeCommonFrame.tlo.set(      Utils.getFloat("Probe","tlo"))
-		cmd = Utils.getStr("Probe","cmd")
-		for p in PROBE_CMD:
-			if p.split()[0] == cmd:
-				ProbeCommonFrame.probeCmd.set(p)
-				break
+		pass
+		# ProbeCommonFrame.fastProbeFeed.set(Utils.getFloat("Probe","fastfeed"))
+		# ProbeCommonFrame.probeFeed.set(Utils.getFloat("Probe","feed"))
+		# ProbeCommonFrame.tlo.set(      Utils.getFloat("Probe","tlo"))
+		# cmd = Utils.getStr("Probe","cmd")
+		# for p in PROBE_CMD:
+		# 	if p.split()[0] == cmd:
+		# 		ProbeCommonFrame.probeCmd.set(p)
+		# 		break
 
 
 #===============================================================================
@@ -435,6 +435,17 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		tkExtra.Balloon.set(self.ancherCombo, _("Select ancher."))
 		self.addWidget(self.ancherCombo)
 
+		col +=2
+		b = Button(lframe(),
+				image=Utils.icons["empty"],
+				text=_("get"),
+				compound="c",
+				command=self.getAncherPos,
+				padx=5, pady=0, width=40)
+		b.grid(row=row, column=col, padx=1, sticky=NSEW)
+		self.addWidget(b)
+		tkExtra.Balloon.set(b, _("Rapid goto to ancher position"))
+
 		# # ---
 		# col += 1
 		# self.probeautogotonext = False
@@ -453,7 +464,7 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		col += 2
 		b = Button(lframe(),
 				image=Utils.icons["rapid"],
-				text=_("Goto Ancher"),
+				text=_("Goto"),
 				compound=LEFT,
 				command=self.gotoAncher,
 				padx=5, pady=0)
@@ -463,15 +474,31 @@ class ProbeFrame(CNCRibbon.PageFrame):
 
 		# ---
 		row,col = row + 1,0
-		Label(lframe(), text=_("WPos:")).grid(row=row, column=col, sticky=E)
+		Label(lframe(), text=_("MPos:")).grid(row=row, column=col, sticky=E)
 
 		col += 1
-		self._ankerX = Label(lframe(), foreground="DarkBlue", background="gray90")
+		self._ankerX = tkExtra.FloatEntry(lframe(), background="White")
 		self._ankerX.grid(row=row, column=col, padx=1, sticky=EW+S)
+		tkExtra.Balloon.set(self._ankerX, _("Set Ancher X Machine position"))
+		self.addWidget(self._ankerX)
 
 		col += 1
-		self._ankerY = Label(lframe(), foreground="DarkBlue", background="gray90")
+		self._ankerY = tkExtra.FloatEntry(lframe(), background="White")
 		self._ankerY.grid(row=row, column=col, padx=1, sticky=EW+S)
+		tkExtra.Balloon.set(self._ankerY, _("Set Ancher Y Machine position"))
+		self.addWidget(self._ankerY)
+
+		col +=1
+		b = Button(lframe(),
+				image=Utils.icons["empty"],
+				text=_("set"),
+				compound="c",
+				command=self.setAncherPos,
+				padx=5, pady=0)
+		b.grid(row=row, column=col, padx=1, sticky=NSEW)
+		self.addWidget(b)
+		tkExtra.Balloon.set(b, _("Rapid goto to ancher position"))
+
 
 		self.selectedAncher.set("Ancher1")
 
@@ -702,11 +729,22 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		self.warn = True
 		self.loadConfig()
 
+	#-----------------------------------------------------------------------
+	def getAncherPos(self):
+		self._ankerX.set(CNC.vars["mx"])
+		self._ankerY.set(CNC.vars["my"])
+
+	#-----------------------------------------------------------------------
+	def setAncherPos(self):
+		ancherStr = self.selectedAncher.get().lower()
+		Utils.setFloat("Probe", ancherStr + "x", self._ankerX.get())
+		Utils.setFloat("Probe", ancherStr + "y", self._ankerY.get())
+
 	#----------------------------------------------------------------------
 	def ancherChange(self, a=None, b=None, c=None):
 		selectedAncher = self.selectedAncher.get().lower()
-		self._ankerX["text"] = Utils.getStr("Probe", selectedAncher + "x")
-		self._ankerY["text"] = Utils.getStr("Probe", selectedAncher + "y")
+		self._ankerX.set(Utils.getStr("Probe", selectedAncher + "x"))
+		self._ankerY.set(Utils.getStr("Probe", selectedAncher + "y"))
 
 	#-----------------------------------------------------------------------
 	def loadConfig(self):
@@ -811,22 +849,12 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		cmd = str(CNC.vars["prbcmd"])
 		ok = False
 
-		v = self.probeXdir.get()
-		if v != "":
-			cmd += "X"+str(v)
-			ok = True
-
-		v = self.probeYdir.get()
-		if v != "":
-			cmd += "Y"+str(v)
-			ok = True
-
-		v = self.probeZdir.get()
+		v = Utils.getStr("Probe", "z")
 		if v != "":
 			cmd += "Z"+str(v)
 			ok = True
 
-		v = ProbeCommonFrame.probeFeed.get()
+		v = CNC.vars["prbfeed"]
 		if v != "":
 			cmd += "F"+str(v)
 
@@ -842,7 +870,7 @@ class ProbeFrame(CNCRibbon.PageFrame):
 	def gotoAncher(self, event=None):
 		try:
 			selectedAncher = self.selectedAncher.get().lower()
-			cmd = "G53 G0 X%g Y%g Z%g\n"%(CNC.vars[selectedAncher + "x"], CNC.vars[selectedAncher + "y"])
+			cmd = "G53 G0 X%g Y%g\n" % (Utils.getFloat("Probe",selectedAncher + "x"), Utils.getFloat("Probe", selectedAncher + "y"))
 		except:
 			return
 		self.sendGCode(cmd)
@@ -2120,6 +2148,8 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lframe = LabelFrame(self, text=_("Auto Tool Change"), foreground="DarkBlue")
 		lframe.pack(side=TOP, fill=X)
 
+		width = 55
+		height = 25
 		# ------
 		row, col = 0, 1
 		Label(lframe, text=_("MX")).grid(row=row, column=col, sticky=EW)
@@ -2128,299 +2158,111 @@ class ATCFrame(CNCRibbon.PageFrame):
 		col += 1
 		Label(lframe, text=_("MZ")).grid(row=row, column=col, sticky=EW)
 
-		# --- Tool 1 Change position ---
+		self.selectedTool = StringVar()
+		self.selectedTool.trace('w', self.toolChange)
+
 		row += 1
 		col = 0
-		Label(lframe, text=_("Tool-1:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.tool1X = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool1X.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool1X, _("Auto tool change Tool-1 MX location"))
-		self.addWidget(self.tool1X)
-		self.tool1X.bind('<KeyRelease>', self.setATCParams)
-		self.tool1X.bind('<FocusOut>', self.setATCParams)
+		self.toolCombo = OptionMenu(lframe, self.selectedTool, *["1","2","3","4","5"])
+		self.toolCombo.config(padx=0, pady=1)
+		self.toolCombo.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.toolCombo, _("Select tool."))
+		self.addWidget(self.toolCombo)
 
 		col += 1
-		self.tool1Y = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool1Y.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool1Y, _("Auto tool change Tool-1 MY location"))
-		self.addWidget(self.tool1Y)
-		self.tool1Y.bind('<KeyRelease>', self.setATCParams)
-		self.tool1Y.bind('<FocusOut>', self.setATCParams)
+		self.toolX = tkExtra.FloatEntry(lframe, background="White", width=3)
+		self.toolX.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.toolX, _("Auto tool change Tool MX location"))
+		self.addWidget(self.toolX)
 
 		col += 1
-		self.tool1Z = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool1Z.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool1Z, _("Auto tool change Tool-1 MZ location"))
-		self.addWidget(self.tool1Z)
-		self.tool1Z.bind('<KeyRelease>', self.setATCParams)
-		self.tool1Z.bind('<FocusOut>', self.setATCParams)
+		self.toolY = tkExtra.FloatEntry(lframe, background="White", width=3)
+		self.toolY.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.toolY, _("Auto tool change Tool MY location"))
+		self.addWidget(self.toolY)
+
+		col += 1
+		self.toolZ = tkExtra.FloatEntry(lframe, background="White", width=3)
+		self.toolZ.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.toolZ, _("Auto tool change Tool MZ location"))
+		self.addWidget(self.toolZ)
 
 		col += 1
 		b = Button(lframe, text=_("get"),
-				   command=self.getTool1Pos,
-				   padx=2, pady=1, width = 4)
+				   command=self.getToolPos,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, width = width, height=height)
 		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Get current gantry position as ATC tool1 change location"))
+		tkExtra.Balloon.set(b, _("Get current gantry position as ATC tool change location"))
 		self.addWidget(b)
 
 		col += 1
-		b = Button(lframe, text=_("on"),
-				   command=self.tool1On,
-				   padx=2, pady=1, width = 4)
+		b = Button(lframe, text=_("set"),
+				   command=self.setToolPos,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, width = width, height=height)
 		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 1 position and put on bit"))
+		tkExtra.Balloon.set(b, _("Set current ATC tool change location"))
 		self.addWidget(b)
 
-		col += 1
-		b = Button(lframe, text=_("off"),
-				   command=self.tool1Off,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 1 position and drop down bit"))
-		self.addWidget(b)
-
-		# --- Tool 2 Change position ---
 		row += 1
 		col = 0
-		Label(lframe, text=_("Tool-2:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.tool2X = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool2X.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool2X, _("Auto tool change Tool-2 MX location"))
-		self.addWidget(self.tool2X)
-		self.tool2X.bind('<KeyRelease>', self.setATCParams)
-		self.tool2X.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool2Y = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool2Y.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool2Y, _("Auto tool change Tool-2 MY location"))
-		self.addWidget(self.tool2Y)
-		self.tool2Y.bind('<KeyRelease>', self.setATCParams)
-		self.tool2Y.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool2Z = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool2Z.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool2Z, _("Auto tool change Tool-2 MZ location"))
-		self.addWidget(self.tool2Z)
-		self.tool2Z.bind('<KeyRelease>', self.setATCParams)
-		self.tool2Z.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		b = Button(lframe, text=_("get"),
-				   command=self.getTool2Pos,
-				   padx=2, pady=1)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Get current gantry position as ATC tool2 change location"))
+		b = Button(lframe, text=_("Mount Tool"),
+				   command=self.mountTool,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, height=height)
+		b.grid(row=row, column=col, sticky=EW, columnspan=3)
+		tkExtra.Balloon.set(b, _("Loose Tool"))
 		self.addWidget(b)
 
-		col += 1
-		b = Button(lframe, text=_("on"),
-				   command=self.tool2On,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 2 position and put on bit"))
+		col += 3
+		b = Button(lframe, text=_("Unmount Tool"),
+				   command=self.unmountTool,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, height=height)
+		b.grid(row=row, column=col, sticky=EW, columnspan=3)
+		tkExtra.Balloon.set(b, _("Clamp Tool"))
 		self.addWidget(b)
 
-		col += 1
-		b = Button(lframe, text=_("off"),
-				   command=self.tool2Off,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 2 position and drop down bit"))
-		self.addWidget(b)
-
-
-		# --- Tool 3 Change position ---
-		row += 1
-		col = 0
-		Label(lframe, text=_("Tool-3:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.tool3X = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool3X.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool3X, _("Auto tool change Tool-3 MX location"))
-		self.addWidget(self.tool3X)
-		self.tool3X.bind('<KeyRelease>', self.setATCParams)
-		self.tool3X.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool3Y = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool3Y.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool3Y, _("Auto tool change Tool-3 MY location"))
-		self.addWidget(self.tool3Y)
-		self.tool3Y.bind('<KeyRelease>', self.setATCParams)
-		self.tool3Y.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool3Z = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool3Z.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool3Z, _("Auto tool change Tool-3 MZ location"))
-		self.addWidget(self.tool3Z)
-		self.tool3Z.bind('<KeyRelease>', self.setATCParams)
-		self.tool3Z.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		b = Button(lframe, text=_("get"),
-				   command=self.getTool3Pos,
-				   padx=2, pady=1)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Get current gantry position as ATC tool3 change location"))
-		self.addWidget(b)
-
-		col += 1
-		b = Button(lframe, text=_("on"),
-				   command=self.tool3On,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 3 position and put on bit"))
-		self.addWidget(b)
-
-		col += 1
-		b = Button(lframe, text=_("off"),
-				   command=self.tool3Off,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 3 position and drop down bit"))
-		self.addWidget(b)
-
-		# --- Tool 4 Change position ---
-		row += 1
-		col = 0
-		Label(lframe, text=_("Tool-4:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.tool4X = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool4X.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool4X, _("Auto tool change Tool-4 MX location"))
-		self.addWidget(self.tool4X)
-		self.tool4X.bind('<KeyRelease>', self.setATCParams)
-		self.tool4X.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool4Y = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool4Y.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool4Y, _("Auto tool change Tool-4 MY location"))
-		self.addWidget(self.tool4Y)
-		self.tool4Y.bind('<KeyRelease>', self.setATCParams)
-		self.tool4Y.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool4Z = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool4Z.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool4Z, _("Auto tool change Tool-4 MZ location"))
-		self.addWidget(self.tool4Z)
-		self.tool4Z.bind('<KeyRelease>', self.setATCParams)
-		self.tool4Z.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		b = Button(lframe, text=_("get"),
-				   command=self.getTool4Pos,
-				   padx=2, pady=1)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Get current gantry position as ATC tool4 change location"))
-		self.addWidget(b)
-
-		col += 1
-		b = Button(lframe, text=_("on"),
-				   command=self.tool4On,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 4 position and put on bit"))
-		self.addWidget(b)
-
-		col += 1
-		b = Button(lframe, text=_("off"),
-				   command=self.tool4Off,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 4 position and drop down bit"))
-		self.addWidget(b)
-
-		# --- Tool 5 Change position ---
-		row += 1
-		col = 0
-		Label(lframe, text=_("Tool-5:")).grid(row=row, column=col, sticky=E)
-		col += 1
-		self.tool5X = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool5X.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool5X, _("Auto tool change Tool-5 MX location"))
-		self.addWidget(self.tool5X)
-		self.tool5X.bind('<KeyRelease>', self.setATCParams)
-		self.tool5X.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool5Y = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool5Y.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool5Y, _("Auto tool change Tool-5 MY location"))
-		self.addWidget(self.tool5Y)
-		self.tool5Y.bind('<KeyRelease>', self.setATCParams)
-		self.tool5Y.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		self.tool5Z = tkExtra.FloatEntry(lframe, background="White", width=5)
-		self.tool5Z.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(self.tool5Z, _("Auto tool change Tool-5 MZ location"))
-		self.addWidget(self.tool5Z)
-		self.tool5Z.bind('<KeyRelease>', self.setATCParams)
-		self.tool5Z.bind('<FocusOut>', self.setATCParams)
-
-		col += 1
-		b = Button(lframe, text=_("get"),
-				   command=self.getTool5Pos,
-				   padx=2, pady=1)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Get current gantry position as ATC tool5 change location"))
-		self.addWidget(b)
-
-		col += 1
-		b = Button(lframe, text=_("on"),
-				   command=self.tool5On,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 5 position and put on bit"))
-		self.addWidget(b)
-
-		col += 1
-		b = Button(lframe, text=_("off"),
-				   command=self.tool5Off,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW)
-		tkExtra.Balloon.set(b, _("Move to tool 5 position and drop down bit"))
-		self.addWidget(b)
 
 		# --- Auto Z Probe position ---
 		row += 1
 		col = 0
 		Label(lframe, text=_("ZProbe:")).grid(row=row, column=col, sticky=E)
 		col += 1
-		self.zProbeX = tkExtra.FloatEntry(lframe, background="White", width=5)
+		self.zProbeX = tkExtra.FloatEntry(lframe, background="White", width=3)
 		self.zProbeX.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(self.zProbeX, _("Auto tool change Z-Probing MX location"))
 		self.addWidget(self.zProbeX)
-		self.zProbeX.bind('<KeyRelease>', self.setATCParams)
-		self.zProbeX.bind('<FocusOut>', self.setATCParams)
+		self.zProbeX.bind('<KeyRelease>', self.setATCProbeParams)
+		self.zProbeX.bind('<FocusOut>', self.setATCProbeParams)
 
 		col += 1
-		self.zProbeY = tkExtra.FloatEntry(lframe, background="White", width=5)
+		self.zProbeY = tkExtra.FloatEntry(lframe, background="White", width=3)
 		self.zProbeY.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(self.zProbeY, _("Auto tool change Z-Probing MY location"))
 		self.addWidget(self.zProbeY)
-		self.zProbeY.bind('<KeyRelease>', self.setATCParams)
-		self.zProbeY.bind('<FocusOut>', self.setATCParams)
+		self.zProbeY.bind('<KeyRelease>', self.setATCProbeParams)
+		self.zProbeY.bind('<FocusOut>', self.setATCProbeParams)
 
 		col += 1
-		self.zProbeZ = tkExtra.FloatEntry(lframe, background="White", width=5)
+		self.zProbeZ = tkExtra.FloatEntry(lframe, background="White", width=3)
 		self.zProbeZ.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(self.zProbeZ, _("Auto tool change Z-Probing depth"))
 		self.addWidget(self.zProbeZ)
-		self.zProbeZ.bind('<KeyRelease>', self.setATCParams)
-		self.zProbeZ.bind('<FocusOut>', self.setATCParams)
+		self.zProbeZ.bind('<KeyRelease>', self.setATCProbeParams)
+		self.zProbeZ.bind('<FocusOut>', self.setATCProbeParams)
 
 		col += 1
 		b = Button(lframe, text=_("get"),
 				   command=self.getZProbePos,
-				   padx=2, pady=1)
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, width = width, height=height)
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Get current gantry position as ATC z-probe location"))
 		self.addWidget(b)
@@ -2428,91 +2270,78 @@ class ATCFrame(CNCRibbon.PageFrame):
 		col += 1
 		b = Button(lframe, text=_("calibrate"),
 				   command=self.calibrate,
-				   padx=2, pady=1, width = 4)
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, width = width, height=height)
 		b.grid(row=row, column=col, columnspan=2, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move to z-probe position and do probe"))
 		self.addWidget(b)
 
-		self.toolRackStatus = BooleanVar()
-		self.btn_text = StringVar()
-		self.btn_text.set("Enable Tool Rack")
-
 		row += 1
 		col = 0
-		b = Button(lframe, text=_("Open Air Pump"),
-				   command=self.openAirPump,
-				   padx=2, pady=1, width = 4)
+		b = Button(lframe, text=_("Loose Tool"),
+				   command=self.looseTool,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, height=height)
 		b.grid(row=row, column=col, sticky=EW, columnspan=3)
-		tkExtra.Balloon.set(b, _("Open Air Pump"))
+		tkExtra.Balloon.set(b, _("Loose Tool"))
 		self.addWidget(b)
 
 		col += 3
-		b = Button(lframe, text=_("Close Air Pump"),
-				   command=self.closeAirPump,
-				   padx=2, pady=1, width = 4)
-		b.grid(row=row, column=col, sticky=EW, columnspan=4)
-		tkExtra.Balloon.set(b, _("Open Air Pump"))
+		b = Button(lframe, text=_("Clamp Tool"),
+				   command=self.clampTool,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, height=height)
+		b.grid(row=row, column=col, sticky=EW, columnspan=3)
+		tkExtra.Balloon.set(b, _("Clamp Tool"))
 		self.addWidget(b)
 
 		row += 1
 		col = 0
-		self.toolrackButton = Checkbutton(lframe,
-				textvariable=self.btn_text,
-				image=Utils.icons["spinningtop"],
-				command=self.controlToolRack,
-				compound=LEFT,
-				indicatoron=False,
-				variable=self.toolRackStatus,
-				padx=1,
-				pady=0)
-		self.toolrackButton.grid(row=row, column=col, columnspan=7, sticky=EW)
-		tkExtra.Balloon.set(self.toolrackButton, _("Enable or Disable tool rack"))
-		self.addWidget(self.toolrackButton)
+		b = Button(lframe, text=_("Enable Tool Rack"),
+				   command=self.enableToolRack,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, height=height)
+		b.grid(row=row, column=col, sticky=EW, columnspan=3)
+		tkExtra.Balloon.set(b, _("Enable Tool Rack"))
+		self.addWidget(b)
+
+		col += 3
+		b = Button(lframe, text=_("Disable Tool Rack"),
+				   command=self.disableToolRack,
+				   image=Utils.icons["empty"],
+				   compound="c",
+				   padx=2, pady=1, height=height)
+		b.grid(row=row, column=col, sticky=EW, columnspan=3)
+		tkExtra.Balloon.set(b, _("Disable Tool Rack"))
+		self.addWidget(b)
 
 		lframe.grid_columnconfigure(1, weight=1)
 		lframe.grid_columnconfigure(2, weight=1)
 		lframe.grid_columnconfigure(3, weight=1)
 
-		self.loadConfig()
+		self.selectedTool.set("1")
 
 
 	# -----------------------------------------------------------------------
-	def controlToolRack(self):
-		if self.toolRackStatus.get():
-			# enable tool rack
-			self.toolrack.enableToolRack()
-			time.sleep(1)
-			#self.app.home()
-			self.btn_text.set("Disable Tool Rack")
-		else:
-			# disable tool rack
-			self.toolrack.disableToolRack()
-			time.sleep(1)
-			#self.app.home()
-			self.btn_text.set("Enable Tool Rack")
+	def enableToolRack(self):
+		# enable tool rack
+		self.toolrack.enableToolRack()
+		time.sleep(1)
+		#self.app.home()
+
+	# -----------------------------------------------------------------------
+	def disableToolRack(self):
+		# disable tool rack
+		self.toolrack.disableToolRack()
+		time.sleep(1)
+		# self.app.home()
 
 	# -----------------------------------------------------------------------
 	def saveConfig(self):
-		Utils.setFloat("ATC", "tool1x", self.tool1X.get())
-		Utils.setFloat("ATC", "tool1y", self.tool1Y.get())
-		Utils.setFloat("ATC", "tool1z", self.tool1Z.get())
-
-		Utils.setFloat("ATC", "tool2x", self.tool2X.get())
-		Utils.setFloat("ATC", "tool2y", self.tool2Y.get())
-		Utils.setFloat("ATC", "tool2z", self.tool2Z.get())
-
-		Utils.setFloat("ATC", "tool3x", self.tool3X.get())
-		Utils.setFloat("ATC", "tool3y", self.tool3Y.get())
-		Utils.setFloat("ATC", "tool3z", self.tool3Z.get())
-
-		Utils.setFloat("ATC", "tool4x", self.tool4X.get())
-		Utils.setFloat("ATC", "tool4y", self.tool4Y.get())
-		Utils.setFloat("ATC", "tool4z", self.tool4Z.get())
-
-		Utils.setFloat("ATC", "tool5x", self.tool5X.get())
-		Utils.setFloat("ATC", "tool5y", self.tool5Y.get())
-		Utils.setFloat("ATC", "tool5z", self.tool5Z.get())
-
 		Utils.setFloat("ATC", "zprobex", self.zProbeX.get())
 		Utils.setFloat("ATC", "zprobey", self.zProbeY.get())
 		Utils.setFloat("ATC", "zprobez", self.zProbeZ.get())
@@ -2521,25 +2350,10 @@ class ATCFrame(CNCRibbon.PageFrame):
 
 	#-----------------------------------------------------------------------
 	def loadConfig(self):
-		self.tool1X.set(Utils.getFloat("ATC","tool1x"))
-		self.tool1Y.set(Utils.getFloat("ATC","tool1y"))
-		self.tool1Z.set(Utils.getFloat("ATC","tool1z"))
-
-		self.tool2X.set(Utils.getFloat("ATC","tool2x"))
-		self.tool2Y.set(Utils.getFloat("ATC","tool2y"))
-		self.tool2Z.set(Utils.getFloat("ATC","tool2z"))
-
-		self.tool3X.set(Utils.getFloat("ATC","tool3x"))
-		self.tool3Y.set(Utils.getFloat("ATC","tool3y"))
-		self.tool3Z.set(Utils.getFloat("ATC","tool3z"))
-
-		self.tool4X.set(Utils.getFloat("ATC","tool4x"))
-		self.tool4Y.set(Utils.getFloat("ATC","tool4y"))
-		self.tool4Z.set(Utils.getFloat("ATC","tool4z"))
-
-		self.tool5X.set(Utils.getFloat("ATC","tool5x"))
-		self.tool5Y.set(Utils.getFloat("ATC","tool5y"))
-		self.tool5Z.set(Utils.getFloat("ATC","tool5z"))
+		selectedToolNum = self.selectedTool.get()
+		self.toolX.set(Utils.getFloat("ATC","tool" + selectedToolNum + "x"))
+		self.toolY.set(Utils.getFloat("ATC","tool" + selectedToolNum + "y"))
+		self.toolZ.set(Utils.getFloat("ATC","tool" + selectedToolNum + "z"))
 
 		self.zProbeX.set(Utils.getFloat("ATC","zprobex"))
 		self.zProbeY.set(Utils.getFloat("ATC","zprobey"))
@@ -2551,52 +2365,53 @@ class ATCFrame(CNCRibbon.PageFrame):
 	#-----------------------------------------------------------------------d
 	def set(self):
 		try:
-			CNC.vars["tool1x"]  = float(self.tool1X.get())
-			CNC.vars["tool1y"]  = float(self.tool1Y.get())
-			CNC.vars["tool1z"]  = float(self.tool1Z.get())
+			CNC.vars["tool1x"]  = float(Utils.getFloat("ATC", "tool1x"))
+			CNC.vars["tool1y"]  = float(Utils.getFloat("ATC", "tool1y"))
+			CNC.vars["tool1z"]  = float(Utils.getFloat("ATC", "tool1z"))
 		except:
 			tkMessageBox.showerror(_("ATC Tool Change Error"),
-					_("Invalid tool change position"),
+					_("Invalid tool change position 1"),
 					parent=self.winfo_toplevel())
 			return
 
 		try:
-			CNC.vars["tool2x"]  = float(self.tool2X.get())
-			CNC.vars["tool2y"]  = float(self.tool2Y.get())
-			CNC.vars["tool2z"]  = float(self.tool2Z.get())
+			CNC.vars["tool2x"]  = float(Utils.getFloat("ATC", "tool2x"))
+			CNC.vars["tool2y"]  = float(Utils.getFloat("ATC", "tool2y"))
+			CNC.vars["tool2z"]  = float(Utils.getFloat("ATC", "tool2z"))
+
 		except:
 			tkMessageBox.showerror(_("ATC Tool Change Error"),
-					_("Invalid tool change position"),
+					_("Invalid tool change position 2"),
 					parent=self.winfo_toplevel())
 			return
 
 		try:
-			CNC.vars["tool3x"]  = float(self.tool3X.get())
-			CNC.vars["tool3y"]  = float(self.tool3Y.get())
-			CNC.vars["tool3z"]  = float(self.tool3Z.get())
+			CNC.vars["tool3x"]  = float(Utils.getFloat("ATC", "tool3x"))
+			CNC.vars["tool3y"]  = float(Utils.getFloat("ATC", "tool3y"))
+			CNC.vars["tool3z"]  = float(Utils.getFloat("ATC", "tool3z"))
 		except:
 			tkMessageBox.showerror(_("ATC Tool Change Error"),
-					_("Invalid tool change position"),
+					_("Invalid tool change position 3"),
 					parent=self.winfo_toplevel())
 			return
 
 		try:
-			CNC.vars["tool4x"]  = float(self.tool4X.get())
-			CNC.vars["tool4y"]  = float(self.tool4Y.get())
-			CNC.vars["tool4z"]  = float(self.tool4Z.get())
+			CNC.vars["tool4x"]  = float(Utils.getFloat("ATC", "tool4x"))
+			CNC.vars["tool4y"]  = float(Utils.getFloat("ATC", "tool4y"))
+			CNC.vars["tool4z"]  = float(Utils.getFloat("ATC", "tool4z"))
 		except:
 			tkMessageBox.showerror(_("ATC Tool Change Error"),
-					_("Invalid tool change position"),
+					_("Invalid tool change position 4"),
 					parent=self.winfo_toplevel())
 			return
 
 		try:
-			CNC.vars["tool5x"]  = float(self.tool5X.get())
-			CNC.vars["tool5y"]  = float(self.tool5Y.get())
-			CNC.vars["tool5z"]  = float(self.tool5Z.get())
+			CNC.vars["tool5x"]  = float(Utils.getFloat("ATC", "tool5x"))
+			CNC.vars["tool5y"]  = float(Utils.getFloat("ATC", "tool5y"))
+			CNC.vars["tool5z"]  = float(Utils.getFloat("ATC", "tool5z"))
 		except:
 			tkMessageBox.showerror(_("ATC Tool Change Error"),
-					_("Invalid tool change position"),
+					_("Invalid tool change position 5"),
 					parent=self.winfo_toplevel())
 			return
 
@@ -2614,74 +2429,42 @@ class ATCFrame(CNCRibbon.PageFrame):
 	def check4Errors(self):
 		return False
 
+	def toolChange(self, a=None, b=None, c=None):
+		self.loadConfig()
+
 	#-----------------------------------------------------------------------
-	def setATCParams(self, dummy=None):
+	def setATCToolParams(self, dummy=None):
 		print("ATC chg handler")
-		CNC.vars["tool1x"] = float(self.tool1X.get())
-		CNC.vars["tool1y"] = float(self.tool1Y.get())
-		CNC.vars["tool1z"] = float(self.tool1Z.get())
+		selectedToolNum = self.selectedTool.get()
+		CNC.vars["tool" + selectedToolNum + "x"] = float(self.toolX.get())
+		CNC.vars["tool" + selectedToolNum + "y"] = float(self.toolY.get())
+		CNC.vars["tool" + selectedToolNum + "z"] = float(self.toolZ.get())
 
-		CNC.vars["tool2x"] = float(self.tool2X.get())
-		CNC.vars["tool2y"] = float(self.tool2Y.get())
-		CNC.vars["tool2z"] = float(self.tool2Z.get())
+		Utils.setFloat("ATC", "tool" + selectedToolNum + "x", self.toolX.get())
+		Utils.setFloat("ATC", "tool" + selectedToolNum + "y", self.toolY.get())
+		Utils.setFloat("ATC", "tool" + selectedToolNum + "z", self.toolZ.get())
 
-		CNC.vars["tool3x"] = float(self.tool3X.get())
-		CNC.vars["tool3y"] = float(self.tool3Y.get())
-		CNC.vars["tool3z"] = float(self.tool3Z.get())
-
-		CNC.vars["tool4x"] = float(self.tool4X.get())
-		CNC.vars["tool4y"] = float(self.tool4Y.get())
-		CNC.vars["tool4z"] = float(self.tool4Z.get())
-
-		CNC.vars["tool5x"] = float(self.tool5X.get())
-		CNC.vars["tool5y"] = float(self.tool5Y.get())
-		CNC.vars["tool5z"] = float(self.tool5Z.get())
-
+	def setATCProbeParams(self, dummy=None):
 		CNC.vars["zprobex"] = float(self.zProbeX.get())
 		CNC.vars["zprobey"] = float(self.zProbeY.get())
 		CNC.vars["zprobez"] = float(self.zProbeZ.get())
 
 	#-----------------------------------------------------------------------
-	def getTool1Pos(self):
-		self.tool1X.set(CNC.vars["mx"])
-		self.tool1Y.set(CNC.vars["my"])
-		self.tool1Z.set(CNC.vars["mz"])
-		self.setATCParams()
+	def getToolPos(self):
+		self.toolX.set(CNC.vars["mx"])
+		self.toolY.set(CNC.vars["my"])
+		self.toolZ.set(CNC.vars["mz"])
 
 	#-----------------------------------------------------------------------
-	def getTool2Pos(self):
-		self.tool2X.set(CNC.vars["mx"])
-		self.tool2Y.set(CNC.vars["my"])
-		self.tool2Z.set(CNC.vars["mz"])
-		self.setATCParams()
-
-	#-----------------------------------------------------------------------
-	def getTool3Pos(self):
-		self.tool3X.set(CNC.vars["mx"])
-		self.tool3Y.set(CNC.vars["my"])
-		self.tool3Z.set(CNC.vars["mz"])
-		self.setATCParams()
-
-	#-----------------------------------------------------------------------
-	def getTool4Pos(self):
-		self.tool4X.set(CNC.vars["mx"])
-		self.tool4Y.set(CNC.vars["my"])
-		self.tool4Z.set(CNC.vars["mz"])
-		self.setATCParams()
-
-	#-----------------------------------------------------------------------
-	def getTool5Pos(self):
-		self.tool5X.set(CNC.vars["mx"])
-		self.tool5Y.set(CNC.vars["my"])
-		self.tool5Z.set(CNC.vars["mz"])
-		self.setATCParams()
+	def setToolPos(self):
+		self.setATCToolParams()
 
 	#-----------------------------------------------------------------------
 	def getZProbePos(self):
 		self.zProbeX.set(CNC.vars["mx"])
 		self.zProbeY.set(CNC.vars["my"])
 		self.zProbeZ.set(CNC.vars["mz"])
-		self.setATCParams()
+		self.setATCProbeParams()
 
 	#-----------------------------------------------------------------------
 	# FIXME should be replaced with the CNC.toolChange()
@@ -2721,7 +2504,8 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.app.home()
 
 	# -----------------------------------------------------------------------
-	def tool1On(self):
+	def mountTool(self):
+		toolnum = self.selectedTool.get()
 		self.set()
 		if self.check4Errors(): return
 		# release clamp
@@ -2729,21 +2513,21 @@ class ATCFrame(CNCRibbon.PageFrame):
 		# move grantry to tool1 position
 		lines = []
 		lines.append("g53 g0 z-2")
-		lines.append("g53 g0 x[tool1x] y[tool1y]")
+		lines.append("g53 g0 x[tool" + toolnum + "x] y[tool" + toolnum + "y]")
 		lines.append("%wait")
-		lines.append("g53 g1 z[tool1z] f[prbfeed]")
+		lines.append("g53 g1 z[tool" + toolnum + "z] f[prbfeed]")
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g90")
 		self.app.run(lines=lines)
 		# wait and run second command
-		self.tool1OnStep2()
+		self.mountToolStep2(toolnum)
 
 	# -----------------------------------------------------------------------
-	def tool1OnStep2(self):
+	def mountToolStep2(self, toolnum):
 		if self.app.running:
 			self.after(1000, self.tool1OnStep2)
 		else:
-			print('running tool1OnStep1 done...')
+			print('running mountTool done...')
 			# clamp the bit
 			self.toolrack.closeAirPump()
 			# move z axis up
@@ -2755,7 +2539,8 @@ class ATCFrame(CNCRibbon.PageFrame):
 			self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
-	def tool1Off(self):
+	def unmountTool(self):
+		toolnum = self.selectedTool.get()
 		self.set()
 		if self.check4Errors(): return
 		# move grantry to tool1 position
@@ -2768,16 +2553,16 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g90")
 		self.app.run(lines=lines)
 		# wait and run second command
-		self.tool1OffStep2()
+		self.unmountToolStep2(toolnum)
 
 	# -----------------------------------------------------------------------
-	def tool1OffStep2(self):
+	def unmountToolStep2(self, toolnum):
 		if self.app.running:
-			self.after(1000, self.tool1OffStep2)
+			self.after(1000, self.unmountToolStep2)
 		else:
-			print('running tool1Offstep1 done...')
+			print('running unmountTool done...')
 			# release the clamp
-			self.toolrack.openAirPump()
+			self.toolrack.closeAirPump()
 			# move z axis up
 			lines = []
 			lines.append("%wait")
@@ -2786,59 +2571,22 @@ class ATCFrame(CNCRibbon.PageFrame):
 			lines.append("g90")
 			self.app.run(lines=lines)
 			# wait and run 3rd command
-			self.too1OffStep3()
+			self.unmountToolStep3(toolnum)
 
 	# -----------------------------------------------------------------------
-	def tool1OffStep3(self):
+	def unmountToolStep3(self, toolnum):
 		if self.app.running:
-			self.after(1000, self.tool1OffStep3)
+			self.after(1000, self.unmountToolStep3())
 		else:
-			rint('running tool1OffStep2 done...')
-			self.toolrack.closeAirPump()
+			print('running unmountToolStep2 done...')
+			self.toolrack.openAirPump()
 
 	# -----------------------------------------------------------------------
-	def tool2On(self):
-		return
-
-
-	# -----------------------------------------------------------------------
-	def tool2Off(self):
-		return
-
-	# -----------------------------------------------------------------------
-	def tool3On(self):
-		return
-
-
-	# -----------------------------------------------------------------------
-	def tool3Off(self):
-		return
-
-	# -----------------------------------------------------------------------
-	def tool4On(self):
-		return
-
-
-	# -----------------------------------------------------------------------
-	def tool4Off(self):
-		return
-
-	# -----------------------------------------------------------------------
-	def tool5On(self):
-		return
-
-
-	# -----------------------------------------------------------------------
-	def tool5Off(self):
-		return
-
-
-	# -----------------------------------------------------------------------
-	def openAirPump(self):
+	def looseTool(self):
 		self.toolrack.openAirPump()
 
 	# -----------------------------------------------------------------------
-	def closeAirPump(self):
+	def clampTool(self):
 		self.toolrack.closeAirPump()
 
 

@@ -274,6 +274,7 @@ class CNCCanvas(Canvas, object):
 		#self.config(xscrollincrement=1, yscrollincrement=1)
 		self.reset()
 		self.initPosition()
+		self.setActionPan()
 
 	#Calculate arguments for antialiasing
 	def antialias_args(self, args, winc=0.5, cw=2):
@@ -1989,6 +1990,8 @@ class CanvasFrame(Frame):
 	# Canvas toolbar FIXME XXX should be moved to CNCCanvas
 	#----------------------------------------------------------------------
 	def createCanvasToolbar(self, toolbar):
+		height=40
+		width = 40
 		b = OptionMenu(toolbar, self.view, *VIEWS)
 		b.config(padx=0, pady=1)
 		b.unbind("F10")
@@ -1996,17 +1999,17 @@ class CanvasFrame(Frame):
 		tkExtra.Balloon.set(b, _("Change viewing angle"))
 
 		b = Button(toolbar, image=Utils.icons["zoom_in"],
-				command=self.canvas.menuZoomIn)
+				command=self.canvas.menuZoomIn, height=height, width=width)
 		tkExtra.Balloon.set(b, _("Zoom In [Ctrl-=]"))
 		b.pack(side=LEFT)
 
 		b = Button(toolbar, image=Utils.icons["zoom_out"],
-				command=self.canvas.menuZoomOut)
+				command=self.canvas.menuZoomOut, height=height, width=width)
 		tkExtra.Balloon.set(b, _("Zoom Out [Ctrl--]"))
 		b.pack(side=LEFT)
 
 		b = Button(toolbar, image=Utils.icons["zoom_on"],
-				command=self.canvas.fit2Screen)
+				command=self.canvas.fit2Screen, height=height, width=width)
 		tkExtra.Balloon.set(b, _("Fit to screen [F]"))
 		b.pack(side=LEFT)
 
@@ -2020,7 +2023,7 @@ class CanvasFrame(Frame):
 					indicatoron=FALSE,
 					variable=self.canvas.actionVar,
 					value=ACTION_SELECT,
-					command=self.canvas.setActionSelect)
+					command=self.canvas.setActionSelect, height=height, width=width)
 		tkExtra.Balloon.set(b, _("Select tool [S]"))
 		self.addWidget(b)
 		b.pack(side=LEFT)
@@ -2029,7 +2032,7 @@ class CanvasFrame(Frame):
 					indicatoron=FALSE,
 					variable=self.canvas.actionVar,
 					value=ACTION_PAN,
-					command=self.canvas.setActionPan)
+					command=self.canvas.setActionPan, height=height, width=width)
 		tkExtra.Balloon.set(b, _("Pan viewport [X]"))
 		b.pack(side=LEFT)
 
@@ -2055,88 +2058,88 @@ class CanvasFrame(Frame):
 					indicatoron=FALSE,
 					variable=self.canvas.actionVar,
 					value=ACTION_RULER,
-					command=self.canvas.setActionRuler)
+					command=self.canvas.setActionRuler, height=height, width=width)
 		tkExtra.Balloon.set(b, _("Ruler [R]"))
 		b.pack(side=LEFT)
 
 		# -----------
 		# Draw flags
 		# -----------
-		Label(toolbar, text=_("Draw:"),
-				image=Utils.icons["sep"],
-				compound=LEFT).pack(side=LEFT, padx=2)
-
-		b = Checkbutton(toolbar,
-				image=Utils.icons["axes"],
-				indicatoron=False,
-				variable=self.draw_axes,
-				command=self.drawAxes)
-		tkExtra.Balloon.set(b, _("Toggle display of axes"))
-		b.pack(side=LEFT)
-
-		b = Checkbutton(toolbar,
-				image=Utils.icons["grid"],
-				indicatoron=False,
-				variable=self.draw_grid,
-				command=self.drawGrid)
-		tkExtra.Balloon.set(b, _("Toggle display of grid lines"))
-		b.pack(side=LEFT)
-
-		b = Checkbutton(toolbar,
-				image=Utils.icons["margins"],
-				indicatoron=False,
-				variable=self.draw_margin,
-				command=self.drawMargin)
-		tkExtra.Balloon.set(b, _("Toggle display of margins"))
-		b.pack(side=LEFT)
-
-		b = Checkbutton(toolbar,
-				text="P",
-				image=Utils.icons["measure"],
-				indicatoron=False,
-				variable=self.draw_probe,
-				command=self.drawProbe)
-		tkExtra.Balloon.set(b, _("Toggle display of probe"))
-		b.pack(side=LEFT)
-
-		b = Checkbutton(toolbar,
-				image=Utils.icons["endmill"],
-				indicatoron=False,
-				variable=self.draw_paths,
-				command=self.toggleDrawFlag)
-		tkExtra.Balloon.set(b, _("Toggle display of paths (G1,G2,G3)"))
-		b.pack(side=LEFT)
-
-		b = Checkbutton(toolbar,
-				image=Utils.icons["rapid"],
-				indicatoron=False,
-				variable=self.draw_rapid,
-				command=self.toggleDrawFlag)
-		tkExtra.Balloon.set(b, _("Toggle display of rapid motion (G0)"))
-		b.pack(side=LEFT)
-
-		b = Checkbutton(toolbar,
-				image=Utils.icons["workspace"],
-				indicatoron=False,
-				variable=self.draw_workarea,
-				command=self.drawWorkarea)
-		tkExtra.Balloon.set(b, _("Toggle display of workarea"))
-		b.pack(side=LEFT)
-
-		b = Checkbutton(toolbar,
-				image=Utils.icons["camera"],
-				indicatoron=False,
-				variable=self.draw_camera,
-				command=self.drawCamera)
-		tkExtra.Balloon.set(b, _("Toggle display of camera"))
-		b.pack(side=LEFT)
-		if Camera.cv is None: b.config(state=DISABLED)
-
-		b = Button(toolbar,
-				image=Utils.icons["refresh"],
-				command=self.viewChange)
-		tkExtra.Balloon.set(b, _("Redraw display [Ctrl-R]"))
-		b.pack(side=LEFT)
+		# Label(toolbar, text=_("Draw:"),
+		# 		image=Utils.icons["sep"],
+		# 		compound=LEFT).pack(side=LEFT, padx=2)
+		#
+		# b = Checkbutton(toolbar,
+		# 		image=Utils.icons["axes"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_axes,
+		# 		command=self.drawAxes)
+		# tkExtra.Balloon.set(b, _("Toggle display of axes"))
+		# b.pack(side=LEFT)
+		#
+		# b = Checkbutton(toolbar,
+		# 		image=Utils.icons["grid"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_grid,
+		# 		command=self.drawGrid)
+		# tkExtra.Balloon.set(b, _("Toggle display of grid lines"))
+		# b.pack(side=LEFT)
+		#
+		# b = Checkbutton(toolbar,
+		# 		image=Utils.icons["margins"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_margin,
+		# 		command=self.drawMargin)
+		# tkExtra.Balloon.set(b, _("Toggle display of margins"))
+		# b.pack(side=LEFT)
+		#
+		# b = Checkbutton(toolbar,
+		# 		text="P",
+		# 		image=Utils.icons["measure"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_probe,
+		# 		command=self.drawProbe)
+		# tkExtra.Balloon.set(b, _("Toggle display of probe"))
+		# b.pack(side=LEFT)
+		#
+		# b = Checkbutton(toolbar,
+		# 		image=Utils.icons["endmill"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_paths,
+		# 		command=self.toggleDrawFlag)
+		# tkExtra.Balloon.set(b, _("Toggle display of paths (G1,G2,G3)"))
+		# b.pack(side=LEFT)
+		#
+		# b = Checkbutton(toolbar,
+		# 		image=Utils.icons["rapid"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_rapid,
+		# 		command=self.toggleDrawFlag)
+		# tkExtra.Balloon.set(b, _("Toggle display of rapid motion (G0)"))
+		# b.pack(side=LEFT)
+		#
+		# b = Checkbutton(toolbar,
+		# 		image=Utils.icons["workspace"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_workarea,
+		# 		command=self.drawWorkarea)
+		# tkExtra.Balloon.set(b, _("Toggle display of workarea"))
+		# b.pack(side=LEFT)
+		#
+		# b = Checkbutton(toolbar,
+		# 		image=Utils.icons["camera"],
+		# 		indicatoron=False,
+		# 		variable=self.draw_camera,
+		# 		command=self.drawCamera)
+		# tkExtra.Balloon.set(b, _("Toggle display of camera"))
+		# b.pack(side=LEFT)
+		# if Camera.cv is None: b.config(state=DISABLED)
+		#
+		# b = Button(toolbar,
+		# 		image=Utils.icons["refresh"],
+		# 		command=self.viewChange)
+		# tkExtra.Balloon.set(b, _("Redraw display [Ctrl-R]"))
+		# b.pack(side=LEFT)
 
 		# -----------
 		self.drawTime = tkExtra.Combobox(toolbar,
