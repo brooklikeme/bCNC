@@ -1818,6 +1818,7 @@ class ToolGroup(CNCRibbon.ButtonGroup):
 #===============================================================================
 class ToolFrame(CNCRibbon.PageFrame):
 	def __init__(self, master, app):
+
 		CNCRibbon.PageFrame.__init__(self, master, "Probe:Tool", app)
 
 		lframe = LabelFrame(self, text=_("Manual Tool Change"), foreground="DarkBlue")
@@ -2215,7 +2216,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 				   compound="c",
 				   padx=2, pady=1, height=height)
 		b.grid(row=row, column=col, sticky=EW, columnspan=3)
-		tkExtra.Balloon.set(b, _("Loose Tool"))
+		tkExtra.Balloon.set(b, _("Mount Tool"))
 		self.addWidget(b)
 
 		col += 3
@@ -2225,7 +2226,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 				   compound="c",
 				   padx=2, pady=1, height=height)
 		b.grid(row=row, column=col, sticky=EW, columnspan=3)
-		tkExtra.Balloon.set(b, _("Clamp Tool"))
+		tkExtra.Balloon.set(b, _("Unmount Tool"))
 		self.addWidget(b)
 
 
@@ -2360,6 +2361,8 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.zProbeZ.set(Utils.getFloat("ATC","zprobez"))
 
 		CNC.vars["toolmz"] = Utils.getFloat("ATC","toolmz")
+		CNC.vars["tooldistance"] = Utils.getFloat("Probe", "tooldistance")
+		CNC.vars["toolheight"] = Utils.getFloat("Probe", "toolheight")
 		self.set()
 
 	#-----------------------------------------------------------------------d
@@ -2481,22 +2484,37 @@ class ATCFrame(CNCRibbon.PageFrame):
 		if self.check4Errors(): return
 		# move grantry to tool1 position
 		lines = []
-		lines.append("g53 g0 z-2")
+		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[zprobex] y[zprobey]")
+		lines.append("g53 g0 z[zprobez+tooldistance]")
 		lines.append("g4 p1")  # wait a sec
 
 		lines.append("%wait")
-		lines.append("g91 g38.2 z[zprobez] f[prbfeed]")
-		lines.append("g4 p1")	# wait a sec
+		lines.append("G91 g38.2 z[0-tooldistance] f[prbfeed]")
 
-		lines.append("%global TLO; TLO=toolmz-mz")
-		lines.append("g43.1z[TLO]")
+		lines.append("g4 p1")	# wait a sec
+		lines.append("%wait")
+
+		lines.append("%global TLO; TLO=prbz-toolmz")
 		lines.append("%update TLO")
 
-		lines.append("g4 p1")	# wait a sec
-		lines.append("g53 g0 z-2")
+		lines.append("g53 g0 z[toolheight]")
 		lines.append("g90")
 		self.app.run(lines=lines)
+
+		self.calibrateStep2()
+
+	def calibrateStep2(self):
+		if self.app.running:
+			self.after(1000, self.calibrateStep2)
+		else:
+			print('running calibrate done...')
+			if tkMessageBox.askyesno(_("Set TLO"),  _("Set current tool as zero TLO?")):
+				CNC.vars["toolmz"] = CNC.vars["prbz"]
+				self.sendGCode("G49")
+				self.app.statustlo["text"] = "TLO:0.0"
+			else:
+				self.sendGCode("G43.1Z" + str(CNC.vars["TLO"]))
 
 	# -----------------------------------------------------------------------
 	def homeZ(self):
@@ -2512,7 +2530,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.toolrack.openAirPump()
 		# move grantry to tool1 position
 		lines = []
-		lines.append("g53 g0 z-2")
+		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[tool" + toolnum + "x] y[tool" + toolnum + "y]")
 		lines.append("%wait")
 		lines.append("g53 g1 z[tool" + toolnum + "z] f[prbfeed]")
@@ -2534,7 +2552,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 			lines = []
 			lines.append("%wait")
 			lines.append("g4 p1")  # wait a sec
-			lines.append("g53 g0 z-2")
+			lines.append("g53 g0 z[toolheight]")
 			lines.append("g90")
 			self.app.run(lines=lines)
 
@@ -2545,7 +2563,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 		if self.check4Errors(): return
 		# move grantry to tool1 position
 		lines = []
-		lines.append("g53 g0 z-2")
+		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[tool1x] y[tool1y]")
 		lines.append("%wait")
 		lines.append("g53 g1 z[tool1z] f[prbfeed]")
@@ -2567,7 +2585,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 			lines = []
 			lines.append("%wait")
 			lines.append("g4 p1")	# wait a sec
-			lines.append("g53 g0 z-2")
+			lines.append("g53 g0 z[toolheight]")
 			lines.append("g90")
 			self.app.run(lines=lines)
 			# wait and run 3rd command
@@ -2623,7 +2641,7 @@ class ProbePage(CNCRibbon.Page):
 	#-----------------------------------------------------------------------
 	def register(self):
 		self._register((ProbeTabGroup, AutolevelGroup, CameraGroup, ToolGroup),
-			(ProbeCommonFrame, ProbeFrame, AutolevelFrame, ToolFrame, ATCFrame))
+			(ProbeCommonFrame, ProbeFrame, AutolevelFrame, ATCFrame))
 
 		self.tabGroup = CNCRibbon.Page.groups["Probe"]
 		self.tabGroup.tab.set("Probe")

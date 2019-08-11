@@ -1252,7 +1252,6 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
 		self.overrideCombo.config(padx=0, pady=1)
 		self.overrideCombo.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(self.overrideCombo, _("Select override type."))
-		self.addWidget(self.overrideCombo)
 
 		col += 1
 		self.overrideScale = Scale(f,

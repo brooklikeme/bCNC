@@ -131,12 +131,19 @@ class Application(Toplevel,Sender):
 		self.statusbar.pack(side=LEFT, fill=X, expand=YES)
 		self.statusbar.configText(fill="DarkBlue", justify=LEFT, anchor=W)
 
+		# TLO
+		self.statustlo = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=8)
+		self.statustlo["text"] = "TLO:0.0"
+		self.statustlo.pack(side=RIGHT)
+
 		self.statusz = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=10)
 		self.statusz.pack(side=RIGHT)
 		self.statusy = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=10)
 		self.statusy.pack(side=RIGHT)
 		self.statusx = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=10)
 		self.statusx.pack(side=RIGHT)
+
+
 
 		# Buffer bar
 		self.bufferbar = tkExtra.ProgressBar(frame, height=20, width=40, relief=SUNKEN)
@@ -2460,9 +2467,10 @@ class Application(Toplevel,Sender):
 		# Update any possible variable?
 		if self._update:
 			if self._update == "toolheight":
-				Page.frames["Probe:Tool"].updateTool()
+				pass
+				#Page.frames["Probe:Tool"].updateTool()
 			elif self._update == "TLO":
-				Page.frames["ProbeCommon"].updateTlo()
+				self.statustlo["text"] = "TLO:" + str(CNC.vars.get("TLO", ""))
 			self._update = None
 
 		if self.running:

@@ -1292,6 +1292,8 @@ class Probe(_Base):
 			("tlo" ,           "mm",   0    , _("TLO"))   ,
 			("cmd",            "G38.2,G38.3,G38.4,G38.5", "G38.2", _("Probe Command")),
 			("z", 			   "mm", -10, 	_("Z Probe Position")),
+			("tooldistance", "mm", 5, _("Tool Distance")),
+			("toolheight", "mm", -5, _("Tool Initial Height")),
 		]
 
 	# ----------------------------------------------------------------------
@@ -1301,6 +1303,8 @@ class Probe(_Base):
 		CNC.vars["fastprbfeed"] = float(self["fastfeed"])
 		CNC.vars["prbfeed"] = float(self["feed"])
 		CNC.vars["prbcmd"] = str(self["cmd"])
+		CNC.vars["tooldistance"] = float(self["tooldistance"])
+		CNC.vars["toolheight"] = float(self["toolheight"])
 		Utils.setFloat("Probe", "z", float(self["z"]))
 		return False
 
