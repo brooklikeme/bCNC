@@ -2338,6 +2338,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 		time.sleep(1)
 		# change y steps
 		self.sendGCode("$101=40")
+		self.sendGCode("G4 P1")
 		# homing cycle
 		self.app.home()
 
@@ -2348,8 +2349,10 @@ class ATCFrame(CNCRibbon.PageFrame):
 		time.sleep(1)
 		# change y steps
 		self.sendGCode("$101=400")
+		self.sendGCode("G4 P1")
 		# set y work position
 		self.sendGCode("G10L20P1Y" + str(CNC.vars["lastwy"]))
+		self.sendGCode("G4 P1")
 
 	# -----------------------------------------------------------------------
 	def saveConfig(self):
