@@ -2336,24 +2336,23 @@ class ATCFrame(CNCRibbon.PageFrame):
 		CNC.vars["lastwy"] = CNC.vars["wy"]
 		# sleep one second
 		time.sleep(1)
+
 		lines = []
-		# change y steps
-		lines.append("$101=40")
-		lines.append("G4 P2")
 		lines.append("$H")
+		lines.append("%wait")
 		self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
 	def disableToolRack(self):
 		# disable tool rack
 		self.toolrack.disableToolRack()
+		# change y steps
 		time.sleep(1)
 		# change y steps
+
 		lines = []
-		# change y steps
-		lines.append("$101=400")
-		lines.append("G4 P2")
-		lines.append("G10L20P1Y" + str(CNC.vars["lastwy"]))
+		lines.append("g10l20p1y" + str(CNC.vars["lastwy"]))
+		lines.append("%wait")
 		self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
@@ -2505,7 +2504,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g4 p1")  # wait a sec
 
 		lines.append("%wait")
-		lines.append("G91 g38.2 z[0-tooldistance] f[prbfeed]")
+		lines.append("g91 g38.2 z[0-tooldistance] f[prbfeed]")
 
 		lines.append("g4 p1")	# wait a sec
 		lines.append("%wait")
@@ -2526,10 +2525,10 @@ class ATCFrame(CNCRibbon.PageFrame):
 			print('running calibrate done...')
 			if tkMessageBox.askyesno(_("Set TLO"),  _("Set current tool as zero TLO?")):
 				CNC.vars["toolmz"] = CNC.vars["prbz"]
-				self.sendGCode("G49")
+				self.sendGCode("g49")
 				self.app.statustlo["text"] = "TLO:0.0"
 			else:
-				self.sendGCode("G43.1Z" + str(CNC.vars["TLO"]))
+				self.sendGCode("g43.1z" + str(CNC.vars["TLO"]))
 
 	# -----------------------------------------------------------------------
 	def homeZ(self):
