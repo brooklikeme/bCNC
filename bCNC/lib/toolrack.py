@@ -24,11 +24,11 @@ class ToolRack(object):
 
     def enableToolRack(self):
         print('Tool rack enabled!')
-        GPIO.output(GPIO_TOOLRACK, GPIO.HIGH)
+        GPIO.output(GPIO_TOOLRACK, GPIO.LOW)
 
     def disableToolRack(self):
         print('Tool rack disabled!')
-        GPIO.output(GPIO_TOOLRACK, GPIO.LOW)
+        GPIO.output(GPIO_TOOLRACK, GPIO.HIGH)
 
     def openAirPump(self):
         print('AirPump opend!')
