@@ -2336,11 +2336,12 @@ class ATCFrame(CNCRibbon.PageFrame):
 		CNC.vars["lastwy"] = CNC.vars["wy"]
 		# sleep one second
 		time.sleep(1)
+		lines = []
 		# change y steps
-		self.sendGCode("$101=40")
-		self.sendGCode("G4 P1")
-		# homing cycle
-		self.app.home()
+		lines.append("$101=40")
+		lines.append("G4 P2")
+		lines.append("$H")
+		self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
 	def disableToolRack(self):
@@ -2348,11 +2349,12 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.toolrack.disableToolRack()
 		time.sleep(1)
 		# change y steps
-		self.sendGCode("$101=400")
-		self.sendGCode("G4 P1")
-		# set y work position
-		self.sendGCode("G10L20P1Y" + str(CNC.vars["lastwy"]))
-		self.sendGCode("G4 P1")
+		lines = []
+		# change y steps
+		lines.append("$101=400")
+		lines.append("G4 P2")
+		lines.append("G10L20P1Y" + str(CNC.vars["lastwy"]))
+		self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
 	def saveConfig(self):
