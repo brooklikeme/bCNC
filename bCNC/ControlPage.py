@@ -36,6 +36,8 @@ _NOZSTEP = 'XY'
 
 OVERRIDES = ["Feed", "Rapid", "Spindle"]
 
+_BUTTONFONT       = ("Sans","-16")
+
 
 #===============================================================================
 # Connection Group
@@ -642,6 +644,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 					command=self.moveXdownYup,
 				    image=Utils.icons["empty"],
 				    height=height,
+				   font=_BUTTONFONT,
 				    compound="c",
 					activebackground="LightYellow")
 
@@ -654,6 +657,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 					command=self.moveYup,
 				    image=Utils.icons["empty"],
 				    height=height,
+				   font=_BUTTONFONT,
 				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
@@ -665,6 +669,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 					command=self.moveXupYup,
 				    image=Utils.icons["empty"],
 				    height=height,
+				   font=_BUTTONFONT,
 				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
@@ -682,6 +687,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 					command=self.moveZup,
 				    image=Utils.icons["empty"],
 					height=height,
+				   font=_BUTTONFONT,
 				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
@@ -696,6 +702,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 					command=self.moveXdown,
 				    image=Utils.icons["empty"],
 				    height=height,
+				   font=_BUTTONFONT,
 				    compound="c",
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
@@ -717,6 +724,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 				    image=Utils.icons["empty"],
 				    height=height,
 				    compound="c",
+				    font=_BUTTONFONT,
 				 	activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move +X"))
@@ -784,6 +792,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 				    image=Utils.icons["empty"],
 				    height=height,
 				    compound="c",
+				   font=_BUTTONFONT,
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move -X -Y"))
@@ -795,6 +804,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 				    image=Utils.icons["empty"],
 				    height=height,
 				    compound="c",
+				   font=_BUTTONFONT,
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move -Y"))
@@ -806,6 +816,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 				    image=Utils.icons["empty"],
 				    height=height,
 				    compound="c",
+				   font=_BUTTONFONT,
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move +X -Y"))
@@ -823,6 +834,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 				    image=Utils.icons["empty"],
 				    height=height,
 				    compound="c",
+				   font=_BUTTONFONT,
 					activebackground="LightYellow")
 		b.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(b, _("Move -Z"))
