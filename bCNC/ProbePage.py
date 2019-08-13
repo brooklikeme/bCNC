@@ -2615,17 +2615,17 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("%wait")
 		lines.append("g53 g0 z[tool" + toolnum + "z + tooldistance]")
 		lines.append("%wait")
-		lines.append("g53 g1 z[tool" + toolnum + "z] f[prbfeed]")
+		lines.append("g53 g1 z[tool" + toolnum + "z] f[fastprbfeed]")
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g90")
 		self.app.run(lines=lines)
 		# wait and run second command
-		self.mountToolStep2(toolnum)
+		self.mountToolStep2()
 
 	# -----------------------------------------------------------------------
-	def mountToolStep2(self, toolnum):
+	def mountToolStep2(self):
 		if self.app.running:
-			self.after(1000, self.tool1OnStep2)
+			self.after(1000, self.mountToolStep2)
 		else:
 			print('running mountTool done...')
 			# clamp the bit
@@ -2650,21 +2650,21 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("%wait")
 		lines.append("g53 g0 z[tool" + toolnum + "z + tooldistance]")
 		lines.append("%wait")
-		lines.append("g53 g1 z[tool" + toolnum + "z] f[prbfeed]")
+		lines.append("g53 g1 z[tool" + toolnum + "z] f[fastprbfeed]")
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g90")
 		self.app.run(lines=lines)
 		# wait and run second command
-		self.unmountToolStep2(toolnum)
+		self.unmountToolStep2()
 
 	# -----------------------------------------------------------------------
-	def unmountToolStep2(self, toolnum):
+	def unmountToolStep2(self):
 		if self.app.running:
 			self.after(1000, self.unmountToolStep2)
 		else:
 			print('running unmountTool done...')
 			# release the clamp
-			self.toolrack.closeAirPump()
+			self.toolrack.openAirPump()
 			# move z axis up
 			lines = []
 			lines.append("%wait")
@@ -2673,15 +2673,15 @@ class ATCFrame(CNCRibbon.PageFrame):
 			lines.append("g90")
 			self.app.run(lines=lines)
 			# wait and run 3rd command
-			self.unmountToolStep3(toolnum)
+			self.unmountToolStep3()
 
 	# -----------------------------------------------------------------------
-	def unmountToolStep3(self, toolnum):
+	def unmountToolStep3(self):
 		if self.app.running:
-			self.after(1000, self.unmountToolStep3())
+			self.after(1000, self.unmountToolStep3)
 		else:
 			print('running unmountToolStep2 done...')
-			self.toolrack.openAirPump()
+			self.toolrack.closeAirPump()
 
 	# -----------------------------------------------------------------------
 	def looseTool(self):
