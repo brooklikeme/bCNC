@@ -502,6 +502,52 @@ class ProbeFrame(CNCRibbon.PageFrame):
 
 		self.selectedAncher.set("Ancher1")
 
+		row += 1
+		col = 1
+		Label(lframe(), text=_("Min X")).grid(row=row, column=col, sticky=EW)
+
+		col += 1
+		Label(lframe(), text=_("Min Y")).grid(row=row, column=col, sticky=EW)
+
+		col += 1
+		b = Button(lframe(),  # "<<Probe>>",
+				   image=Utils.icons["empty"],
+				   text=_("get"),
+				   compound="c",
+				   command=self.getMinMargins,
+				   padx=5, pady=0)
+		b.grid(row=row, column=col, rowspan=2, padx=1, sticky=NSEW)
+		self.addWidget(b)
+		tkExtra.Balloon.set(b, _("Get Min work position"))
+
+		col += 1
+		b = Button(lframe(),  # "<<Probe>>",
+				   image=Utils.icons["rapid"],
+				   text=_("Goto"),
+				   compound=LEFT,
+				   command=self.GotoMinMargin,
+				   padx=5, pady=0)
+		b.grid(row=row, column=col, padx=1, columnspan=2, rowspan=2, sticky=NSEW)
+		self.addWidget(b)
+		tkExtra.Balloon.set(b, _("Goto min Work position"))
+
+		# --- X ---
+		row += 1
+		col = 0
+		Label(lframe(), text=_("Margin:")).grid(row=row, column=col, sticky=EW)
+
+		col += 1
+		self.marginXmin = Label(lframe(), foreground="DarkBlue",
+					background="gray90", width=5)
+		self.marginXmin.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.marginXmin, _("X minimum"))
+
+		col += 1
+		self.marginYmin = Label(lframe(), foreground="DarkBlue",
+					background="gray90", width=5)
+		self.marginYmin.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.marginYmin, _("X minimum"))
+
 		#
 		# col += 1
 		# self.probeXdir = tkExtra.FloatEntry(lframe(), background="White")
@@ -525,7 +571,7 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		lframe().grid_columnconfigure(2,weight=1)
 
 		frame2 = Frame(lframe, pady = 5)
-		frame2.pack(side=TOP, fill=X)
+		frame2.pack(side=BOTTOM, fill=X)
 		# ---
 		row = 0
 		col = 0
@@ -551,6 +597,8 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		b.grid(row=row, column=col, padx=1, sticky=EW)
 		self.addWidget(b)
 		tkExtra.Balloon.set(b, _("Perform XYZ probe cycle"))
+
+
 
 		frame2.grid_columnconfigure(0, weight=1)
 		frame2.grid_columnconfigure(1, weight=1)
@@ -728,6 +776,22 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		#----------------------------------------------------------------
 		self.warn = True
 		self.loadConfig()
+
+	def GotoMinMargin(self):
+		try:
+			if CNC.vars["xmin"] > CNC.vars["xmax"]:
+				return
+			selectedAncher = self.selectedAncher.get().lower()
+			cmd = "G90 G0 X%g Y%g\n" % (CNC.vars["xmin"], CNC.vars["ymin"])
+		except:
+			return
+		self.sendGCode(cmd)
+
+	def getMinMargins(self):
+		if CNC.vars["xmin"] > CNC.vars["xmax"]:
+			return
+		self.marginXmin["text"] = str(CNC.vars["xmin"])
+		self.marginYmin["text"] = str(CNC.vars["ymin"])
 
 	#-----------------------------------------------------------------------
 	def getAncherPos(self):
@@ -1331,6 +1395,8 @@ class AutolevelFrame(CNCRibbon.PageFrame):
 
 	#-----------------------------------------------------------------------
 	def getMargins(self, event=None):
+		if CNC.vars["xmin"] > CNC.vars["xmax"]:
+			return
 		self.probeXmin.set(str(CNC.vars["xmin"]))
 		self.probeXmax.set(str(CNC.vars["xmax"]))
 		self.probeYmin.set(str(CNC.vars["ymin"]))
@@ -2547,6 +2613,8 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[tool" + toolnum + "x] y[tool" + toolnum + "y]")
 		lines.append("%wait")
+		lines.append("g53 g0 z[tool" + toolnum + "z + tooldistance]")
+		lines.append("%wait")
 		lines.append("g53 g1 z[tool" + toolnum + "z] f[prbfeed]")
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g90")
@@ -2578,9 +2646,11 @@ class ATCFrame(CNCRibbon.PageFrame):
 		# move grantry to tool1 position
 		lines = []
 		lines.append("g53 g0 z[toolheight]")
-		lines.append("g53 g0 x[tool1x] y[tool1y]")
+		lines.append("g53 g0 x[tool" + toolnum + "x] y[tool" + toolnum + "y]")
 		lines.append("%wait")
-		lines.append("g53 g1 z[tool1z] f[prbfeed]")
+		lines.append("g53 g0 z[tool" + toolnum + "z + tooldistance]")
+		lines.append("%wait")
+		lines.append("g53 g1 z[tool" + toolnum + "z] f[prbfeed]")
 		lines.append("g4 p1")	# wait a sec
 		lines.append("g90")
 		self.app.run(lines=lines)
