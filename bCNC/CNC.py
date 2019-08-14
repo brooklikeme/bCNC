@@ -1710,7 +1710,7 @@ class CNC:
 		lines.append("%%msg Tool change T%02d" % (self.tool))
 
 		lines.append("%enabletool")	# enable toolrack
-		#lines.append("$H")  # Homing
+		lines.append("$H")  # Homing
 		lines.append("%wait") # wait for end of homing
 
 		if CNC.vars["lasttool"] != 0:
@@ -1766,7 +1766,7 @@ class CNC:
 		lines.append("g90")
 
 		# disable
-		#lines.append("$H")  # Homing
+		lines.append("$H")  # Homing
 		lines.append("%wait") # wait for end of homing
 		lines.append("%disabletool")
 		lines.append("g10l20p1y[_y]")

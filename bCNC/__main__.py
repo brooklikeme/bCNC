@@ -131,10 +131,16 @@ class Application(Toplevel,Sender):
 		self.statusbar.pack(side=LEFT, fill=X, expand=YES)
 		self.statusbar.configText(fill="DarkBlue", justify=LEFT, anchor=W)
 
+		#TOOL
+		self.statustool = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=8)
+		self.statustool["text"] = "TOOL:0"
+		self.statustool.pack(side=RIGHT)
+
 		# TLO
 		self.statustlo = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=8)
 		self.statustlo["text"] = "TLO:0.0"
 		self.statustlo.pack(side=RIGHT)
+
 
 		self.statusz = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=10)
 		self.statusz.pack(side=RIGHT)
@@ -2471,6 +2477,8 @@ class Application(Toplevel,Sender):
 				#Page.frames["Probe:Tool"].updateTool()
 			elif self._update == "TLO":
 				self.statustlo["text"] = "TLO:" + str(CNC.vars.get("TLO", ""))
+			elif self._update == "lasttool":
+				self.statustool["text"] = "TOOL:" + str(CNC.vars.get("lasttool", ""))
 			self._update = None
 
 		if self.running:
