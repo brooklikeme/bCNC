@@ -2659,11 +2659,12 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g53 g0 x[tool" + toolnum + "x] y[tool" + toolnum + "y]")
 		lines.append("g53 g0 z[tool" + toolnum + "z + tooldistance]")
 		lines.append("g53 g1 z[tool" + toolnum + "z] f[fastprbfeed]")
-		lines.append("%wait")
 		lines.append("g4 p1")	# wait a sec
+		lines.append("%wait")
 		lines.append("%loosetool")
 		lines.append("%wait")
 		lines.append("g53 g0 z[toolheight]")
+		lines.append("%wait")
 		lines.append("%clamptool")
 		lines.append("%wait")
 		lines.append("g90")
