@@ -1710,6 +1710,7 @@ class CNC:
 		lines.append("%%msg Tool change T%02d" % (self.tool))
 
 		lines.append("%enabletool")	# enable toolrack
+		lines.append("%wait")
 		lines.append("$H")  # Homing
 		lines.append("%wait") # wait for end of homing
 
@@ -1766,6 +1767,7 @@ class CNC:
 		lines.append("g90")
 
 		# disable
+		lines.append("%wait")
 		lines.append("$H")  # Homing
 		lines.append("%wait") # wait for end of homing
 		lines.append("%disabletool")
