@@ -2567,11 +2567,19 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines = []
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[zprobex] y[zprobey]")
-		lines.append("g53 g0 z[zprobez+tooldistance]")
+		#lines.append("g53 g0 z[zprobez+tooldistance]")
 		lines.append("g4 p1")  # wait a sec
 
+		# first probe using fast probe feed
 		lines.append("%wait")
-		lines.append("g91 g38.2 z[0-tooldistance] f[prbfeed]")
+		lines.append("g91 g38.2 z[zprobez-toolheight] f[fastprbfeed]")
+
+		# # second probe using normal probe feed
+		lines.append("g4 p1")	# wait a sec
+		lines.append("%wait")
+		lines.append("g53 g0 z[mz + 2]")
+		lines.append("%wait")
+		lines.append("g91 g38.2 z-3 f[prbfeed]")
 
 		lines.append("g4 p1")	# wait a sec
 		lines.append("%wait")
@@ -2629,6 +2637,8 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("%wait")
 		lines.append("g90")
+		lines.append("%global lasttool; lasttool=" + toolnum)
+		lines.append("%update lasttool")
 		self.app.run(lines=lines)
 		# wait and run second command
 
@@ -2668,6 +2678,8 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("%clamptool")
 		lines.append("%wait")
 		lines.append("g90")
+		lines.append("%global lasttool; lasttool=0")
+		lines.append("%update lasttool")
 		self.app.run(lines=lines)
 
 	# # -----------------------------------------------------------------------

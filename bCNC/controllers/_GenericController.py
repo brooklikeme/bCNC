@@ -170,7 +170,7 @@ class _GenericController:
 		G = " ".join([x for x in CNC.vars["G"] if x[0]=="G"])	# remember $G
 		TLO = CNC.vars["TLO"]
 		self.softReset(False)			# reset controller
-		self.purgeControllerExtra()
+		#self.purgeControllerExtra()
 		self.master.runEnded()
 		self.master.stopProbe()
 		if G: self.master.sendGCode(G)			# restore $G

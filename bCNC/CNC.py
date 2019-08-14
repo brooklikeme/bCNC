@@ -754,12 +754,13 @@ class CNC:
 		}
 
 	drillPolicy    = 1		# Expand Canned cycles
-	toolPolicy     = 1		# Should be in sync with ProbePage
+	toolPolicy     = 5		# Should be in sync with ProbePage
 					# 0 - send to grbl
 					# 1 - skip those lines
 					# 2 - manual tool change (WCS)
 					# 3 - manual tool change (TLO)
 					# 4 - manual tool change (No Probe)
+					# 5 - auto tool change (No Probe)
 
 	toolWaitAfterProbe = True	# wait at tool change position after probing
 	appendFeed	   = False	# append feed on every G1/G2/G3 commands to be used
@@ -889,7 +890,7 @@ class CNC:
 		self.mval = 0
 		self.lval = 1
 		self.tool = 0
-		self._lastTool = None
+		CNC.vars["lasttool"] = 0
 
 		self.absolute    = True		# G90/G91     absolute/relative motion
 		self.arcabsolute = False	# G90.1/G91.1 absolute/relative arc
@@ -1694,83 +1695,94 @@ class CNC:
 	# code to change manually tool
 	#----------------------------------------------------------------------
 	def toolChange(self, tool=None):
-		if tool is not None:
-			# Force a change
-			self.tool = tool
-			self._lastTool = None
 
 		# check if it is the same tool
-		if self.tool is None or self.tool == self._lastTool: return []
+		if self.tool is None or self.tool > 5 or self.tool < 1 or self.tool == CNC.vars["lasttool"]: return []
 
 		# create the necessary code
 		lines = []
 		lines.append("$g")	# remember state and populate variables
 		lines.append("m5")	# stop spindle
+		lines.append("g4 p5")  # wait 5s for spindle to stop
 		lines.append("%wait")
+
 		lines.append("%_x,_y,_z = wx,wy,wz")	# remember position
-		lines.append("g53 g0 z[toolchangez]")
-		lines.append("g53 g0 x[toolchangex] y[toolchangey]")
+		lines.append("%%msg Tool change T%02d" % (self.tool))
+
+		lines.append("%enabletool")	# enable toolrack
+		#lines.append("$H")  # Homing
+		lines.append("%wait") # wait for end of homing
+
+		if CNC.vars["lasttool"] != 0:
+			# drop tool first
+			lines.append("g53 g0 z[toolheight]")
+			lines.append("g53 g0 x[tool" + CNC.vars["lasttool"] + "x] y[tool" + CNC.vars["lasttool"] + "y]")
+			lines.append("g53 g0 z[tool" + CNC.vars["lasttool"] + "z + tooldistance]")
+			lines.append("g53 g1 z[tool" + CNC.vars["lasttool"] + "z] f[fastprbfeed]")
+			lines.append("g4 p1")  # wait a sec
+			lines.append("%wait")
+			lines.append("%loosetool")
+			lines.append("%wait")
+			lines.append("g53 g0 z[toolheight]")
+			lines.append("%wait")
+			lines.append("%clamptool")
+			lines.append("%wait")
+			lines.append("g90")
+
+		# mount new tool
+		lines.append("g53 g0 z[toolheight]")
+		lines.append("g53 g0 x[tool" + str(self.tool) + "x] y[tool" + str(self.tool) + "y]")
 		lines.append("%wait")
+		lines.append("%loosetool")
+		lines.append("%wait")
+		lines.append("g53 g0 z[tool" + str(self.tool) + "z + tooldistance]")
+		lines.append("%wait")
+		lines.append("g53 g1 z[tool" + str(self.tool) + "z] f[fastprbfeed]")
+		lines.append("%wait")
+		lines.append("%clamptool")
+		lines.append("%wait")
+		lines.append("g53 g0 z[toolheight]")
+		lines.append("%wait")
+		lines.append("g90")
 
-		if CNC.comment:
-			lines.append("%%msg Tool change T%02d (%s)"%(self.tool,CNC.comment))
-		else:
-			lines.append("%%msg Tool change T%02d"%(self.tool))
-		lines.append("m0")	# feed hold
+		# calibrate new tool
+		lines.append("g53 g0 z[toolheight]")
+		lines.append("g53 g0 x[zprobex] y[zprobey]")
+		lines.append("g4 p1")  # wait a sec
+		lines.append("%wait")
+		lines.append("g91 g38.2 z[zprobez-toolheight] f[fastprbfeed]") # first probe using fast probe feed
+		lines.append("g4 p1")
+		lines.append("%wait")
+		lines.append("g53 g0 z[mz + 2]")
+		lines.append("%wait")
+		lines.append("g91 g38.2 z-3 f[prbfeed]") # second probe using normal probe feed
+		lines.append("g4 p1")	# wait a sec
+		lines.append("%wait")
+		lines.append("%global TLO; TLO=prbz-toolmz")
+		lines.append("%update TLO")
+		lines.append("g43.1z[TLO]")
+		lines.append("%wait")
+		lines.append("g53 g0 z[toolheight]")
+		lines.append("g90")
 
-		if CNC.toolPolicy < 4:
-			lines.append("g53 g0 x[toolprobex] y[toolprobey]")
-			lines.append("g53 g0 z[toolprobez]")
-
-			# fixed WCS
-			if CNC.vars["fastprbfeed"]:
-				prb_reverse = {"2": "4", "3": "5", "4": "2", "5": "3"}
-				CNC.vars["prbcmdreverse"] = (CNC.vars["prbcmd"][:-1] +
-							     prb_reverse[CNC.vars["prbcmd"][-1]])
-				currentFeedrate = CNC.vars["fastprbfeed"]
-				while currentFeedrate > CNC.vars["prbfeed"]:
-					lines.append("%wait")
-					lines.append("g91 [prbcmd] %s z[toolprobez-mz-tooldistance]" \
-							% CNC.fmt('f',currentFeedrate))
-					lines.append("%wait")
-					lines.append("[prbcmdreverse] %s z[toolprobez-mz]" \
-							% CNC.fmt('f',currentFeedrate))
-					currentFeedrate /= 10
-			lines.append("%wait")
-			lines.append("g91 [prbcmd] f[prbfeed] z[toolprobez-mz-tooldistance]")
-
-			if CNC.toolPolicy==2:
-				# Adjust the current WCS to fit to the tool
-				# FIXME could be done dynamically in the code
-				p = WCS.index(CNC.vars["WCS"])+1
-				lines.append("g10l20p%d z[toolheight]"%(p))
-				lines.append("%wait")
-
-			elif CNC.toolPolicy==3:
-				# Modify the tool length, update the TLO
-				lines.append("g4 p1")	# wait a sec to get the probe info
-				lines.append("%wait")
-				lines.append("%global TLO; TLO=prbz-toolmz")
-				lines.append("g43.1z[TLO]")
-				lines.append("%update TLO")
-
-			lines.append("g53 g0 z[toolchangez]")
-			lines.append("g53 g0 x[toolchangex] y[toolchangey]")
-
-		if CNC.toolWaitAfterProbe:
-			lines.append("%wait")
-			lines.append("%msg Restart spindle")
-			lines.append("m0")	# feed hold
+		# disable
+		#lines.append("$H")  # Homing
+		lines.append("%wait") # wait for end of homing
+		lines.append("%disabletool")
+		lines.append("g10l20p1y[_y]")
+		lines.append("%wait")
 
 		# restore state
 		lines.append("g90")		# restore mode
-		lines.append("g0 x[_x] y[_y]")	# ... x,y position
-		lines.append("g0 z[_z]")	# ... z position
+		lines.append("g0 x[_x]")	# restore x position
+		lines.append("g0 z[_z]")	# restore z position
 		lines.append("f[feed] [spindle]")# ... feed and spindle
 		lines.append("g4 p5")		# wait 5s for spindle to speed up
+		lines.append("%wait")
+		lines.append("%msg Run")
+		lines.append("%global lasttool; lasttool=" + str(self.tool))
+		lines.append("%update lasttool")
 
-		# remember present tool
-		self._lastTool = self.tool
 		return lines
 
 	#----------------------------------------------------------------------
