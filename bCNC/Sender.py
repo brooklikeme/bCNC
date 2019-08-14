@@ -30,9 +30,10 @@ try:
 except ImportError:
 	from queue import *
 
-from CNC import WAIT, MSG, UPDATE, WCS, CNC, GCode
+from CNC import WAIT, MSG, UPDATE, ENABLETOOL, DISABLETOOL, LOOSETOOL, CLAMPTOOL, WCS, CNC, GCode
 import Utils
 import Pendant
+from lib.toolrack import *
 from _GenericGRBL import ERROR_CODES
 
 WIKI = "https://github.com/vlachoudis/bCNC/wiki"
@@ -85,6 +86,8 @@ class Sender:
 	MSG_CLEAR   =  6	# clear buffer
 
 	def __init__(self):
+		self.toolrack = ToolRack()
+
 		# Global variables
 		self.history	 = []
 		self._historyPos = None
@@ -680,6 +683,18 @@ class Sender:
 							# Count executed commands as well
 							self._gcount += 1
 							self._update = tosend[1]
+						elif tosend[0] == ENABLETOOL:
+							self._gcount += 1
+							self.enableTool()
+						elif tosend[0] == DISABLETOOL:
+							self._gcount += 1
+							self.disableTool()
+						elif tosend[0] == LOOSETOOL:
+							self._gcount += 1
+							self.looseTool()
+						elif tosend[0] == CLAMPTOOL:
+							self._gcount += 1
+							self.clampTool()
 						else:
 							# Count executed commands as well
 							self._gcount += 1
@@ -794,3 +809,27 @@ class Sender:
 					sline.append(tosend)
 					cline.append(len(tosend))
 					tg = t
+
+	# -----------------------------------------------------------------------
+	def enableTool(self):
+		# enable tool rack
+		self.toolrack.enableToolRack()
+		time.sleep(1)
+
+	# -----------------------------------------------------------------------
+	def disableTool(self):
+		# disable tool rack
+		self.toolrack.disableToolRack()
+		time.sleep(1)
+
+	# -----------------------------------------------------------------------
+	def looseTool(self):
+		# enable tool rack
+		self.toolrack.openAirPump()
+		time.sleep(1)
+
+	# -----------------------------------------------------------------------
+	def clampTool(self):
+		# disable tool rack
+		self.toolrack.closeAirPump()
+		time.sleep(1)

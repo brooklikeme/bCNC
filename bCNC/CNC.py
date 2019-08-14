@@ -39,6 +39,12 @@ MSG    = 3
 WAIT   = 4
 UPDATE = 5
 
+ENABLETOOL=11
+DISABLETOOL=12
+LOOSETOOL=13
+CLAMPTOOL=14
+
+
 XY   = 0
 XZ   = 1
 YZ   = 2
@@ -1079,6 +1085,14 @@ class CNC:
 				return (MSG, args)
 			elif cmd=="%update":
 				return (UPDATE, args)
+			elif cmd=="%enabletool":
+				return (ENABLETOOL,)
+			elif cmd=="%disabletool":
+				return (DISABLETOOL,)
+			elif cmd=="%loosetool":
+				return (LOOSETOOL,)
+			elif cmd=="%clamptool":
+				return (CLAMPTOOL,)
 			elif line.startswith("%if running") and not CNC.vars["running"]:
 				# ignore if running lines when not running
 				return None

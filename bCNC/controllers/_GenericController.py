@@ -166,7 +166,6 @@ class _GenericController:
 	def purgeController(self):
 		self.master.serial.write(b"!")
 		self.master.serial.flush()
-		time.sleep(1)
 		# remember and send all G commands
 		G = " ".join([x for x in CNC.vars["G"] if x[0]=="G"])	# remember $G
 		TLO = CNC.vars["TLO"]

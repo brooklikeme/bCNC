@@ -75,6 +75,7 @@ CAMERA_LOCATION_ORDER = [
 #===============================================================================
 class ProbeTabGroup(CNCRibbon.ButtonGroup):
 	def __init__(self, master, app):
+
 		CNCRibbon.ButtonGroup.__init__(self, master, N_("Probe"), app)
 
 		self.tab = StringVar()
@@ -2395,28 +2396,23 @@ class ATCFrame(CNCRibbon.PageFrame):
 
 	# -----------------------------------------------------------------------
 	def enableToolRack(self):
-		# enable tool rack
-		self.toolrack.enableToolRack()
 		# record y machine position
 		CNC.vars["lastmy"] = CNC.vars["my"]
 		CNC.vars["lastwy"] = CNC.vars["wy"]
-		# sleep one second
-		time.sleep(1)
 
 		lines = []
+		lines.append("%enabletool")
 		lines.append("$H")
 		lines.append("%wait")
 		self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
 	def disableToolRack(self):
-		# disable tool rack
-		self.toolrack.disableToolRack()
-		# change y steps
-		time.sleep(1)
-		# change y steps
-
+		CNC.vars["lastwy"] = 15
+		if "lastwy" not in CNC.vars:
+			return
 		lines = []
+		lines.append("%disabletool")
 		lines.append("g10l20p1y" + str(CNC.vars["lastwy"]))
 		lines.append("%wait")
 		self.app.run(lines=lines)
@@ -2563,6 +2559,11 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.set()
 		if self.check4Errors(): return
 		# move grantry to tool1 position
+		zeroTLO = False
+
+		if tkMessageBox.askyesno(_("Set TLO"),  _("Set current tool as zero TLO?")):
+			zeroTLO = True
+
 		lines = []
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[zprobex] y[zprobey]")
@@ -2575,26 +2576,32 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g4 p1")	# wait a sec
 		lines.append("%wait")
 
-		lines.append("%global TLO; TLO=prbz-toolmz")
-		lines.append("%update TLO")
+		if zeroTLO:
+			lines.append("%global TLO; TLO=0")
+			lines.append("%update TLO")
+			lines.append("%global toolmz; toolmz=prbz")
+			lines.append("G49")
+		else:
+			lines.append("%global TLO; TLO=prbz-toolmz")
+			lines.append("%update TLO")
+			lines.append("g43.1z[TLO]")
 
+		lines.append("%wait")
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g90")
 		self.app.run(lines=lines)
 
-		self.calibrateStep2()
-
-	def calibrateStep2(self):
-		if self.app.running:
-			self.after(1000, self.calibrateStep2)
-		else:
-			print('running calibrate done...')
-			if tkMessageBox.askyesno(_("Set TLO"),  _("Set current tool as zero TLO?")):
-				CNC.vars["toolmz"] = CNC.vars["prbz"]
-				self.sendGCode("g49")
-				self.app.statustlo["text"] = "TLO:0.0"
-			else:
-				self.sendGCode("g43.1z" + str(CNC.vars["TLO"]))
+	# def calibrateStep2(self):
+	# 	if self.app.running:
+	# 		self.after(1000, self.calibrateStep2)
+	# 	else:
+	# 		print('running calibrate done...')
+	# 		if tkMessageBox.askyesno(_("Set TLO"),  _("Set current tool as zero TLO?")):
+	# 			CNC.vars["toolmz"] = CNC.vars["prbz"]
+	# 			self.sendGCode("g49")
+	# 			self.app.statustlo["text"] = "TLO:0.0"
+	# 		else:
+	# 			self.sendGCode("g43.1z" + str(CNC.vars["TLO"]))
 
 	# -----------------------------------------------------------------------
 	def homeZ(self):
@@ -2606,37 +2613,40 @@ class ATCFrame(CNCRibbon.PageFrame):
 		toolnum = self.selectedTool.get()
 		self.set()
 		if self.check4Errors(): return
-		# release clamp
-		self.toolrack.openAirPump()
 		# move grantry to tool1 position
 		lines = []
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[tool" + toolnum + "x] y[tool" + toolnum + "y]")
 		lines.append("%wait")
+		lines.append("%loosetool")
+		lines.append("%wait")
 		lines.append("g53 g0 z[tool" + toolnum + "z + tooldistance]")
 		lines.append("%wait")
 		lines.append("g53 g1 z[tool" + toolnum + "z] f[fastprbfeed]")
-		lines.append("g4 p1")	# wait a sec
+		lines.append("%wait")
+		lines.append("%clamptool")
+		lines.append("%wait")
+		lines.append("g53 g0 z[toolheight]")
+		lines.append("%wait")
 		lines.append("g90")
 		self.app.run(lines=lines)
 		# wait and run second command
-		self.mountToolStep2()
 
 	# -----------------------------------------------------------------------
-	def mountToolStep2(self):
-		if self.app.running:
-			self.after(1000, self.mountToolStep2)
-		else:
-			print('running mountTool done...')
-			# clamp the bit
-			self.toolrack.closeAirPump()
-			# move z axis up
-			lines = []
-			lines.append("%wait")
-			lines.append("g4 p1")  # wait a sec
-			lines.append("g53 g0 z[toolheight]")
-			lines.append("g90")
-			self.app.run(lines=lines)
+	# def mountToolStep2(self):
+	# 	if self.app.running:
+	# 		self.after(1000, self.mountToolStep2)
+	# 	else:
+	# 		print('running mountTool done...')
+	# 		# clamp the bit
+	# 		self.toolrack.closeAirPump()
+	# 		# move z axis up
+	# 		lines = []
+	# 		lines.append("%wait")
+	# 		lines.append("g4 p1")  # wait a sec
+	# 		lines.append("g53 g0 z[toolheight]")
+	# 		lines.append("g90")
+	# 		self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
 	def unmountTool(self):
@@ -2647,41 +2657,43 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines = []
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[tool" + toolnum + "x] y[tool" + toolnum + "y]")
-		lines.append("%wait")
 		lines.append("g53 g0 z[tool" + toolnum + "z + tooldistance]")
-		lines.append("%wait")
 		lines.append("g53 g1 z[tool" + toolnum + "z] f[fastprbfeed]")
+		lines.append("%wait")
 		lines.append("g4 p1")	# wait a sec
+		lines.append("%loosetool")
+		lines.append("%wait")
+		lines.append("g53 g0 z[toolheight]")
+		lines.append("%clamptool")
+		lines.append("%wait")
 		lines.append("g90")
 		self.app.run(lines=lines)
-		# wait and run second command
-		self.unmountToolStep2()
 
-	# -----------------------------------------------------------------------
-	def unmountToolStep2(self):
-		if self.app.running:
-			self.after(1000, self.unmountToolStep2)
-		else:
-			print('running unmountTool done...')
-			# release the clamp
-			self.toolrack.openAirPump()
-			# move z axis up
-			lines = []
-			lines.append("%wait")
-			lines.append("g4 p1")	# wait a sec
-			lines.append("g53 g0 z[toolheight]")
-			lines.append("g90")
-			self.app.run(lines=lines)
-			# wait and run 3rd command
-			self.unmountToolStep3()
+	# # -----------------------------------------------------------------------
+	# def unmountToolStep2(self):
+	# 	if self.app.running:
+	# 		self.after(1000, self.unmountToolStep2)
+	# 	else:
+	# 		print('running unmountTool done...')
+	# 		# release the clamp
+	# 		self.toolrack.openAirPump()
+	# 		# move z axis up
+	# 		lines = []
+	# 		lines.append("g4 p1")	# wait a sec
+	# 		lines.append("%wait")
+	# 		lines.append("g53 g0 z[toolheight]")
+	# 		lines.append("g90")
+	# 		self.app.run(lines=lines)
+	# 		# wait and run 3rd command
+	# 		self.unmountToolStep3()
 
-	# -----------------------------------------------------------------------
-	def unmountToolStep3(self):
-		if self.app.running:
-			self.after(1000, self.unmountToolStep3)
-		else:
-			print('running unmountToolStep2 done...')
-			self.toolrack.closeAirPump()
+	# # -----------------------------------------------------------------------
+	# def unmountToolStep3(self):
+	# 	if self.app.running:
+	# 		self.after(1000, self.unmountToolStep3)
+	# 	else:
+	# 		print('running unmountToolStep2 done...')
+	# 		self.toolrack.closeAirPump()
 
 	# -----------------------------------------------------------------------
 	def looseTool(self):
