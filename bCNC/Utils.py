@@ -37,10 +37,12 @@ except:
 	serial = None
 
 __prg__     = "bCNC"
+__tool__    = "TOOL"
 prgpath   = os.path.abspath(os.path.dirname(sys.argv[0]))
 iniSystem = os.path.join(prgpath,"%s.ini"%(__prg__))
 iniUser   = os.path.expanduser("~/.%s" % (__prg__))
 hisFile   = os.path.expanduser("~/.%s.history" % (__prg__))
+iniTool   = os.path.expanduser("~/.%s" % (__tool__))
 
 # dirty way of substituting the "_" on the builtin namespace
 #__builtin__.__dict__["_"] = gettext.translation('bCNC', 'locale', fallback=True).ugettext
@@ -97,6 +99,7 @@ LANGUAGES = {
 icons     = {}
 images     = {}
 config    = ConfigParser.ConfigParser()
+toolconfig = ConfigParser.ConfigParser()
 print("new-config", __name__, config) #This is here to debug the fact that config is sometimes instantiated twice
 language  = ""
 
@@ -184,7 +187,6 @@ def saveConfiguration():
 	f.close()
 	delIcons()
 
-
 #----------------------------------------------------------------------
 # Remove items that are the same as in the default ini
 #----------------------------------------------------------------------
@@ -206,6 +208,21 @@ def cleanConfiguration():
 				pass
 	config = newconfig
 
+#------------------------------------------------------------------------------
+# Load tool config
+#------------------------------------------------------------------------------
+def loadToolConfig():
+	global toolconfig
+	toolconfig.read(iniTool)
+
+#------------------------------------------------------------------------------
+# Save tool config
+#------------------------------------------------------------------------------
+def saveToolConfig():
+	global toolconfig
+	f = open(iniTool, "w")
+	toolconfig.write(f)
+	f.close()
 
 #------------------------------------------------------------------------------
 # add section if it doesn't exist
@@ -254,6 +271,26 @@ def getBool(section, name, default=False):
 	try: return bool(int(config.get(section, name)))
 	except: return default
 
+
+#------------------------------------------------------------------------------
+def getToolInt(section, name, default=0):
+	global toolconfig
+	try: return int(toolconfig.get(section, name))
+	except: return default
+
+
+#------------------------------------------------------------------------------
+def getToolFloat(section, name, default=0.0):
+	global toolconfig
+	try: return float(toolconfig.get(section, name))
+	except: return default
+
+#------------------------------------------------------------------------------
+def setToolStr(section, name, value):
+	global toolconfig
+	if not toolconfig.has_section(section):
+		toolconfig.add_section(section)
+	toolconfig.set(section, name, str(value))
 
 #-------------------------------------------------------------------------------
 # Return a font from a string

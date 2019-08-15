@@ -86,6 +86,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				compound=TOP,
 				variable=self.tab,
 				value="Probe",
+				width=70,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Simple probing along a direction"))
@@ -97,6 +98,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				compound=TOP,
 				variable=self.tab,
 				value="Autolevel",
+				width=70,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Autolevel Z surface"))
@@ -121,6 +123,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				compound=TOP,
 				variable=self.tab,
 				value="Tool",
+				width=70,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Setup probing for manual tool change"))
@@ -904,30 +907,27 @@ class ProbeFrame(CNCRibbon.PageFrame):
 	#-----------------------------------------------------------------------
 	def zProbe(self, event=None):
 
-		if ProbeCommonFrame.probeUpdate():
-			tkMessageBox.showerror(_("Probe Error"),
-				_("Invalid probe feed rate"),
-				parent=self.winfo_toplevel())
-			return
-		self.warnMessage()
+		#self.warnMessage()
 
-		cmd = str(CNC.vars["prbcmd"])
-		ok = False
+		zPos = Utils.getStr("Probe", "z")
 
-		v = Utils.getStr("Probe", "z")
-		if v != "":
-			cmd += "Z"+str(v)
-			ok = True
+		lines = []
+		lines.append("g90 g38.2 z" + zPos + " f[fastprbfeed]")
+		lines.append("%wait")
+		lines.append("g53 g0 z[mz + 2]")
+		lines.append("%wait")
+		lines.append("g91 g38.2 z-3 f[prbfeed]")
+		lines.append("%wait")
+		lines.append("g10l20p1z0")
+		lines.append("%global TLO; TLO=0")
+		lines.append("%update TLO")
+		lines.append("G49")
+		lines.append("%global lasttoolmz; lasttoolmz=toolmz")
+		lines.append("%update lasttoolmz")
+		lines.append("%wait")
+		lines.append("g90 g0 z[safe]")
+		self.app.run(lines=lines)
 
-		v = CNC.vars["prbfeed"]
-		if v != "":
-			cmd += "F"+str(v)
-
-		if ok:
-			self.sendGCode(cmd)
-		else:
-			tkMessageBox.showerror(_("Probe Error"),
-					_("At least one probe direction should be specified"))
 
 	#-----------------------------------------------------------------------
 	# Rapid move to the last probed location
@@ -2051,7 +2051,6 @@ class ToolFrame(CNCRibbon.PageFrame):
 
 		Utils.setFloat("Probe", "tooldistance",self.probeDistance.get())
 		Utils.setFloat("Probe", "toolheight",  self.toolHeight.get())
-		Utils.setFloat("Probe", "toolmz",      CNC.vars.get("toolmz",0.))
 
 	#-----------------------------------------------------------------------
 	def loadConfig(self):
@@ -2067,7 +2066,6 @@ class ToolFrame(CNCRibbon.PageFrame):
 		self.toolHeight.set(   Utils.getFloat("Probe","toolheight"))
 		self.toolPolicy.set(TOOL_POLICY[Utils.getInt("Probe","toolpolicy",0)])
 		self.toolWait.set(TOOL_WAIT[Utils.getInt("Probe","toolwait",1)])
-		CNC.vars["toolmz"] = Utils.getFloat("Probe","toolmz")
 		self.set()
 
 	#-----------------------------------------------------------------------
@@ -2166,34 +2164,34 @@ class ToolFrame(CNCRibbon.PageFrame):
 		self.set()
 		if self.check4Errors(): return
 		lines = []
-		lines.append("g53 g0 z[toolchangez]")
-		lines.append("g53 g0 x[toolchangex] y[toolchangey]")
-		lines.append("g53 g0 x[toolprobex] y[toolprobey]")
-		lines.append("g53 g0 z[toolprobez]")
-		if CNC.vars["fastprbfeed"]:
-			prb_reverse = {"2": "4", "3": "5", "4": "2", "5": "3"}
-			CNC.vars["prbcmdreverse"] = (CNC.vars["prbcmd"][:-1] +
-						prb_reverse[CNC.vars["prbcmd"][-1]])
-			currentFeedrate = CNC.vars["fastprbfeed"]
-			while currentFeedrate > CNC.vars["prbfeed"]:
-				lines.append("%wait")
-				lines.append("g91 [prbcmd] %s z[toolprobez-mz-tooldistance]" \
-						% CNC.fmt('f',currentFeedrate))
-				lines.append("%wait")
-				lines.append("[prbcmdreverse] %s z[toolprobez-mz]" \
-						% CNC.fmt('f',currentFeedrate))
-				currentFeedrate /= 10
-		lines.append("%wait")
-		lines.append("g91 [prbcmd] f[prbfeed] z[toolprobez-mz-tooldistance]")
-		lines.append("g4 p1")	# wait a sec
-		lines.append("%wait")
-		lines.append("%global toolheight; toolheight=wz")
-		lines.append("%global toolmz; toolmz=prbz")
-		lines.append("%update toolheight")
-		lines.append("g53 g0 z[toolchangez]")
-		lines.append("g53 g0 x[toolchangex] y[toolchangey]")
-		lines.append("g90")
-		self.app.run(lines=lines)
+		# lines.append("g53 g0 z[toolchangez]")
+		# lines.append("g53 g0 x[toolchangex] y[toolchangey]")
+		# lines.append("g53 g0 x[toolprobex] y[toolprobey]")
+		# lines.append("g53 g0 z[toolprobez]")
+		# if CNC.vars["fastprbfeed"]:
+		# 	prb_reverse = {"2": "4", "3": "5", "4": "2", "5": "3"}
+		# 	CNC.vars["prbcmdreverse"] = (CNC.vars["prbcmd"][:-1] +
+		# 				prb_reverse[CNC.vars["prbcmd"][-1]])
+		# 	currentFeedrate = CNC.vars["fastprbfeed"]
+		# 	while currentFeedrate > CNC.vars["prbfeed"]:
+		# 		lines.append("%wait")
+		# 		lines.append("g91 [prbcmd] %s z[toolprobez-mz-tooldistance]" \
+		# 				% CNC.fmt('f',currentFeedrate))
+		# 		lines.append("%wait")
+		# 		lines.append("[prbcmdreverse] %s z[toolprobez-mz]" \
+		# 				% CNC.fmt('f',currentFeedrate))
+		# 		currentFeedrate /= 10
+		# lines.append("%wait")
+		# lines.append("g91 [prbcmd] f[prbfeed] z[toolprobez-mz-tooldistance]")
+		# lines.append("g4 p1")	# wait a sec
+		# lines.append("%wait")
+		# lines.append("%global toolheight; toolheight=wz")
+		# lines.append("%global toolmz; toolmz=prbz")
+		# lines.append("%update toolheight")
+		# lines.append("g53 g0 z[toolchangez]")
+		# lines.append("g53 g0 x[toolchangex] y[toolchangey]")
+		# lines.append("g90")
+		# self.app.run(lines=lines)
 
 	#-----------------------------------------------------------------------
 	# FIXME should be replaced with the CNC.toolChange()
@@ -2423,8 +2421,6 @@ class ATCFrame(CNCRibbon.PageFrame):
 		Utils.setFloat("ATC", "zprobey", self.zProbeY.get())
 		Utils.setFloat("ATC", "zprobez", self.zProbeZ.get())
 
-		Utils.setFloat("ATC", "toolmz",      CNC.vars.get("toolmz",0.))
-
 	#-----------------------------------------------------------------------
 	def loadConfig(self):
 		selectedToolNum = self.selectedTool.get()
@@ -2436,7 +2432,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.zProbeY.set(Utils.getFloat("ATC","zprobey"))
 		self.zProbeZ.set(Utils.getFloat("ATC","zprobez"))
 
-		CNC.vars["toolmz"] = Utils.getFloat("ATC","toolmz")
+
 		CNC.vars["tooldistance"] = Utils.getFloat("Probe", "tooldistance")
 		CNC.vars["toolheight"] = Utils.getFloat("Probe", "toolheight")
 		self.set()
@@ -2559,10 +2555,6 @@ class ATCFrame(CNCRibbon.PageFrame):
 		self.set()
 		if self.check4Errors(): return
 		# move grantry to tool1 position
-		zeroTLO = False
-
-		if tkMessageBox.askyesno(_("Set TLO"),  _("Set current tool as zero TLO?")):
-			zeroTLO = True
 
 		lines = []
 		lines.append("g53 g0 z[toolheight]")
@@ -2584,15 +2576,10 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lines.append("g4 p1")	# wait a sec
 		lines.append("%wait")
 
-		if zeroTLO:
-			lines.append("%global TLO; TLO=0")
-			lines.append("%update TLO")
-			lines.append("%global toolmz; toolmz=prbz")
-			lines.append("G49")
-		else:
-			lines.append("%global TLO; TLO=prbz-toolmz")
-			lines.append("%update TLO")
-			lines.append("g43.1z[TLO]")
+		lines.append("%global TLO; TLO=prbz-lasttoolmz")
+		lines.append("%update TLO")
+		lines.append("%global toolmz; toolmz=prbz")
+		lines.append("%update toolmz")
 
 		lines.append("%wait")
 		lines.append("g53 g0 z[toolheight]")

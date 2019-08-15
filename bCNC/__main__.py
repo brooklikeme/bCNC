@@ -48,6 +48,7 @@ sys.path.append(os.path.join(PRGPATH, 'controllers'))
 # before any string is initialized
 import Utils
 Utils.loadConfiguration()
+Utils.loadToolConfig()
 
 import rexx
 import tkExtra
@@ -132,12 +133,17 @@ class Application(Toplevel,Sender):
 		self.statusbar.configText(fill="DarkBlue", justify=LEFT, anchor=W)
 
 		#TOOL
-		self.statustool = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=8)
+		self.statustmz = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=10)
+		self.statustmz["text"] = "TMZ:0.0"
+		self.statustmz.pack(side=RIGHT)
+
+		#TOOL
+		self.statustool = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=6)
 		self.statustool["text"] = "TOOL:0"
 		self.statustool.pack(side=RIGHT)
 
 		# TLO
-		self.statustlo = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=8)
+		self.statustlo = Label(frame, foreground="DarkRed", relief=SUNKEN, anchor=W, width=10)
 		self.statustlo["text"] = "TLO:0.0"
 		self.statustlo.pack(side=RIGHT)
 
@@ -493,7 +499,13 @@ class Application(Toplevel,Sender):
 			if filename is None: break
 			bFileDialog.append2History(os.path.dirname(filename))
 
-		CNC.vars["lasttool"] = Utils.getInt(Utils.__prg__, "lasttool", 0)
+		# init tool config
+		CNC.vars["TLO"] = 0.0
+		CNC.vars["lasttoolmz"] = 0.0
+		CNC.vars["toolmz"] = Utils.getToolFloat("TOOL", "toolmz", 0.0)
+		CNC.vars["lasttool"] = Utils.getToolInt("TOOL", "lasttool", 0)
+		self.statustmz["text"] = "TMZ:" + str(CNC.vars.get("lasttoolmz", ""))
+		self.statustool["text"] = "TOOL:" + str(CNC.vars.get("lasttool", ""))
 
 	#-----------------------------------------------------------------------
 	def setStatus(self, msg, force_update=False):
@@ -2479,8 +2491,16 @@ class Application(Toplevel,Sender):
 				#Page.frames["Probe:Tool"].updateTool()
 			elif self._update == "TLO":
 				self.statustlo["text"] = "TLO:" + str(CNC.vars.get("TLO", ""))
+			elif self._update == "toolmz":
+				Utils.setToolStr("TOOL", "toolmz", CNC.vars.get("toolmz", 0.0))
+				Utils.saveToolConfig()
 			elif self._update == "lasttool":
 				self.statustool["text"] = "TOOL:" + str(CNC.vars.get("lasttool", ""))
+				Utils.setToolStr("TOOL", "lasttool", CNC.vars.get("lasttool", 0))
+				Utils.saveToolConfig()
+			elif self._update == "lasttoolmz":
+				self.statustmz["text"] = "TMZ:" + str(CNC.vars.get("lasttoolmz", ""))
+
 			self._update = None
 
 		if self.running:

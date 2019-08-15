@@ -1758,8 +1758,10 @@ class CNC:
 		lines.append("g91 g38.2 z-3 f[prbfeed]") # second probe using normal probe feed
 		lines.append("g4 p1")	# wait a sec
 		lines.append("%wait")
-		lines.append("%global TLO; TLO=prbz-toolmz")
+		lines.append("%global TLO; TLO=prbz-lasttoolmz")
 		lines.append("%update TLO")
+		lines.append("%global toolmz; toolmz=prbz")
+		lines.append("%update toolmz")
 		lines.append("g43.1z[TLO]")
 		lines.append("%wait")
 		lines.append("g53 g0 z[toolheight]")
