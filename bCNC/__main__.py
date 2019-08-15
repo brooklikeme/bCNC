@@ -493,6 +493,8 @@ class Application(Toplevel,Sender):
 			if filename is None: break
 			bFileDialog.append2History(os.path.dirname(filename))
 
+		CNC.vars["lasttool"] = Utils.getInt(Utils.__prg__, "lasttool", 0)
+
 	#-----------------------------------------------------------------------
 	def setStatus(self, msg, force_update=False):
 		self.statusbar.configText(text=msg, fill="DarkBlue")

@@ -890,7 +890,6 @@ class CNC:
 		self.mval = 0
 		self.lval = 1
 		self.tool = 0
-		CNC.vars["lasttool"] = 0
 
 		self.absolute    = True		# G90/G91     absolute/relative motion
 		self.arcabsolute = False	# G90.1/G91.1 absolute/relative arc
