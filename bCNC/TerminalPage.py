@@ -31,6 +31,7 @@ class TerminalGroup(CNCRibbon.ButtonGroup):
 				image=Utils.icons["clean32"],
 				text=_("Clear"),
 				compound=TOP,
+				width=60,
 				background=Ribbon._BACKGROUND)
 		b.pack(fill=BOTH, expand=YES)
 		tkExtra.Balloon.set(b, _("Clear terminal"))
@@ -59,6 +60,7 @@ class CommandsGroup(CNCRibbon.ButtonGroup):
 				compound=TOP,
 				anchor=W,
 				state=state,
+				width=60,
 				command=self.app.viewSettings,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
@@ -70,6 +72,7 @@ class CommandsGroup(CNCRibbon.ButtonGroup):
 				text=_("Parameters"),
 				compound=TOP,
 				anchor=W,
+				width=60,
 				command=self.app.viewParameters,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
@@ -80,6 +83,7 @@ class CommandsGroup(CNCRibbon.ButtonGroup):
 				image=Utils.icons["gear32"],
 				text=_("State"),
 				compound=TOP,
+				width=60,
 				anchor=W,
 				command=self.app.viewState,
 				background=Ribbon._BACKGROUND)
@@ -132,6 +136,7 @@ class CommandsGroup(CNCRibbon.ButtonGroup):
 				text=_("Help"),
 				compound=TOP,
 				anchor=W,
+				width=60,
 				command=self.app.grblHelp,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)

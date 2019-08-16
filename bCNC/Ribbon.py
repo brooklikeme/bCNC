@@ -610,7 +610,7 @@ class TabRibbonFrame(Frame):
 		page._tab = TabButton(self._tabFrame,
 				image    = page._icon,
 				text     = _(page.name),
-				width = 80,
+				width = 70,
 				compound = LEFT,
 				value    = page.name,
 				variable = self.activePage,

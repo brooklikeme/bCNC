@@ -2247,6 +2247,10 @@ class Application(Toplevel,Sender):
 		self.initRun()
 		self.canvas.clearSelection()
 		self._runLines = sys.maxsize	# temporary WARNING this value is used
+
+		# init expected tool
+		self.cnc.initExpectedTool()
+
 						# by Sender._serialIO to check if we
 						# are still sending or we finished
 		self._gcount   = 0		# count executed lines

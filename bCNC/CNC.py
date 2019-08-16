@@ -890,6 +890,7 @@ class CNC:
 		self.mval = 0
 		self.lval = 1
 		self.tool = 0
+		self.expectedtool = 0
 
 		self.absolute    = True		# G90/G91     absolute/relative motion
 		self.arcabsolute = False	# G90.1/G91.1 absolute/relative arc
@@ -1691,12 +1692,18 @@ class CNC:
 		return lines
 
 	#----------------------------------------------------------------------
+	# init expected tool
+	#----------------------------------------------------------------------
+	def initExpectedTool(self):
+		self.expectedtool = CNC.vars["lasttool"]
+
+	#----------------------------------------------------------------------
 	# code to change manually tool
 	#----------------------------------------------------------------------
 	def toolChange(self, tool=None):
 
 		# check if it is the same tool
-		if self.tool is None or self.tool > 5 or self.tool < 1 or self.tool == CNC.vars["lasttool"]: return []
+		if self.tool is None or self.tool > 5 or self.tool < 1 or self.tool == self.expectedtool: return []
 
 		# create the necessary code
 		lines = []
@@ -1716,9 +1723,9 @@ class CNC:
 		if CNC.vars["lasttool"] != 0:
 			# drop tool first
 			lines.append("g53 g0 z[toolheight]")
-			lines.append("g53 g0 x[tool" + CNC.vars["lasttool"] + "x] y[tool" + CNC.vars["lasttool"] + "y]")
-			lines.append("g53 g0 z[tool" + CNC.vars["lasttool"] + "z + tooldistance]")
-			lines.append("g53 g1 z[tool" + CNC.vars["lasttool"] + "z] f[fastprbfeed]")
+			lines.append("g53 g0 x[tool" + str(self.expectedtool) + "x] y[tool" + str(self.expectedtool) + "y]")
+			lines.append("g53 g0 z[tool" + str(self.expectedtool) + "z + tooldistance]")
+			lines.append("g53 g1 z[tool" + str(self.expectedtool) + "z] f[fastprbfeed]")
 			lines.append("g4 p1")  # wait a sec
 			lines.append("%wait")
 			lines.append("%loosetool")
@@ -1785,6 +1792,8 @@ class CNC:
 		lines.append("%msg Run")
 		lines.append("%global lasttool; lasttool=" + str(self.tool))
 		lines.append("%update lasttool")
+
+		self.expectedtool = self.tool
 
 		return lines
 

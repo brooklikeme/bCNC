@@ -81,6 +81,7 @@ class FileGroup(CNCRibbon.ButtonGroup):
 				image=Utils.icons["open32"],
 				text=_("Open"),
 				compound=TOP,
+				width=60,
 				background=Ribbon._BACKGROUND)
 		b.grid(row=row, column=col, rowspan=2, padx=0, pady=0, sticky=NSEW)
 		tkExtra.Balloon.set(b, _("Open existing gcode/dxf file [Ctrl-O]"))
@@ -229,6 +230,7 @@ class CloseGroup(CNCRibbon.ButtonGroup):
 				image=Utils.icons["exit32"],
 				compound=TOP,
 				command=app.quit,
+				width=60,
 				anchor=W,
 				background=Ribbon._BACKGROUND)
 		b.pack(fill=BOTH, expand=YES)

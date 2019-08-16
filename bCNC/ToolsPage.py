@@ -1565,6 +1565,7 @@ class ConfigGroup(CNCRibbon.ButtonGroup):
 				text=_("Config"),
 				compound=TOP,
 				variable=app.tools.active,
+				width=60,
 				value="CNC",
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
@@ -1577,6 +1578,7 @@ class ConfigGroup(CNCRibbon.ButtonGroup):
 				text=_("Controller"),
 				compound=TOP,
 				variable=app.tools.active,
+				width=60,
 				value="Controller",
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
@@ -1588,6 +1590,7 @@ class ConfigGroup(CNCRibbon.ButtonGroup):
 				text=_("Probe"),
 				compound=TOP,
 				variable=app.tools.active,
+				width=60,
 				value="Probe",
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)

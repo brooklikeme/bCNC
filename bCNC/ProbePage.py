@@ -86,7 +86,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				compound=TOP,
 				variable=self.tab,
 				value="Probe",
-				width=70,
+				width=60,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Simple probing along a direction"))
@@ -98,7 +98,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				compound=TOP,
 				variable=self.tab,
 				value="Autolevel",
-				width=70,
+				width=60,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Autolevel Z surface"))
@@ -123,7 +123,7 @@ class ProbeTabGroup(CNCRibbon.ButtonGroup):
 				compound=TOP,
 				variable=self.tab,
 				value="Tool",
-				width=70,
+				width=60,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Setup probing for manual tool change"))
@@ -918,7 +918,7 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		lines.append("%wait")
 		lines.append("g91 g38.2 z-3 f[prbfeed]")
 		lines.append("%wait")
-		lines.append("g10l20p1z0")
+		lines.append("g90g10l20p1z0")
 		lines.append("%global TLO; TLO=0")
 		lines.append("%update TLO")
 		lines.append("G49")
