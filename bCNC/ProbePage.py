@@ -912,7 +912,8 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		zPos = Utils.getStr("Probe", "z")
 
 		lines = []
-		lines.append("g90 g38.2 z" + zPos + " f[fastprbfeed]")
+		lines.append("%wait")
+		lines.append("g91 g38.2 z" + zPos + " f[fastprbfeed]")
 		lines.append("%wait")
 		lines.append("g53 g0 z[mz + 2]")
 		lines.append("%wait")
