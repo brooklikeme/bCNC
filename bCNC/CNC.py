@@ -736,7 +736,7 @@ class CNC:
 			"diameter"   : 3.175,	# Tool diameter
 			"cutfeed"    : 1000.,	# Material feed for cutting
 			"cutfeedz"   : 500.,	# Material feed for cutting
-			"safe"       : 3.,
+			"safe"       : 5.,
 			"state"      : "",
 			"pins"       : "",
 			"msg"        : "",
@@ -890,7 +890,6 @@ class CNC:
 		self.mval = 0
 		self.lval = 1
 		self.tool = 0
-		self.expectedtool = 0
 
 		self.absolute    = True		# G90/G91     absolute/relative motion
 		self.arcabsolute = False	# G90.1/G91.1 absolute/relative arc
@@ -1760,9 +1759,9 @@ class CNC:
 		lines.append("g91 g38.2 z[zprobez-toolheight] f[fastprbfeed]") # first probe using fast probe feed
 		lines.append("g4 p1")
 		lines.append("%wait")
-		lines.append("g53 g0 z[mz + 2]")
+		lines.append("g53 g0 z[mz + 1]")
 		lines.append("%wait")
-		lines.append("g91 g38.2 z-3 f[prbfeed]") # second probe using normal probe feed
+		lines.append("g91 g38.2 z-2 f[prbfeed]") # second probe using normal probe feed
 		lines.append("g4 p1")	# wait a sec
 		lines.append("%wait")
 		lines.append("%global TLO; TLO=prbz-lasttoolmz")
