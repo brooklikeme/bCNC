@@ -1708,13 +1708,16 @@ class CNC:
 		lines = []
 		lines.append("$g")	# remember state and populate variables
 		lines.append("m5")	# stop spindle
-		lines.append("g4 p5")  # wait 5s for spindle to stop
+		lines.append("g4 p2")  # wait 5s for spindle to stop
 		lines.append("%wait")
 
 		lines.append("%_x,_y,_z = wx,wy,wz")	# remember position
 		lines.append("%%msg Tool change T%02d" % (self.tool))
 
 		lines.append("%enabletool")	# enable toolrack
+		lines.append("g53 g0 z[initoffset]") # speed up
+		lines.append("g53 g0 x[initoffset]")  # speed up
+
 		lines.append("%wait")
 		lines.append("$H")  # Homing
 		lines.append("%wait") # wait for end of homing
@@ -1754,15 +1757,12 @@ class CNC:
 		# calibrate new tool
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[zprobex] y[zprobey]")
-		lines.append("g4 p1")  # wait a sec
 		lines.append("%wait")
 		lines.append("g91 g38.2 z[zprobez-toolheight] f[fastprbfeed]") # first probe using fast probe feed
-		lines.append("g4 p1")
 		lines.append("%wait")
 		lines.append("g53 g0 z[mz + 1]")
 		lines.append("%wait")
 		lines.append("g91 g38.2 z-2 f[prbfeed]") # second probe using normal probe feed
-		lines.append("g4 p1")	# wait a sec
 		lines.append("%wait")
 		lines.append("%global TLO; TLO=prbz-lasttoolmz")
 		lines.append("%update TLO")
@@ -1785,8 +1785,9 @@ class CNC:
 		lines.append("g90")		# restore mode
 		lines.append("g0 x[_x]")	# restore x position
 		lines.append("g0 z[_z]")	# restore z position
+		lines.append("%wait")
 		lines.append("f[feed] [spindle]")# ... feed and spindle
-		lines.append("g4 p5")		# wait 5s for spindle to speed up
+		lines.append("g4 p2")		# wait 5s for spindle to speed up
 		lines.append("%wait")
 		lines.append("%msg Run")
 		lines.append("%global lasttool; lasttool=" + str(self.tool))

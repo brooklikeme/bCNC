@@ -1294,6 +1294,7 @@ class Probe(_Base):
 			("z", 			   "mm", -10, 	_("Z Probe Position")),
 			("tooldistance", "mm", 8, _("Tool Distance")),
 			("toolheight", "mm", -30, _("Tool Initial Height")),
+			("initoffset", "mm", -5, _("Tool Initial Offset")),
 		]
 
 	# ----------------------------------------------------------------------
@@ -1305,6 +1306,7 @@ class Probe(_Base):
 		CNC.vars["prbcmd"] = str(self["cmd"])
 		CNC.vars["tooldistance"] = float(self["tooldistance"])
 		CNC.vars["toolheight"] = float(self["toolheight"])
+		CNC.vars["initoffset"] = float(self["initoffset"])
 		Utils.setFloat("Probe", "z", float(self["z"]))
 		return False
 
