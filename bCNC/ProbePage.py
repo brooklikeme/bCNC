@@ -927,7 +927,7 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		lines.append("%wait")
 		lines.append("g90g10l20p1z[mz-prbz]")
 		lines.append("%wait")
-		lines.append("g90 g0 z[safe]")
+		#lines.append("g90 g0 z[safe]")
 		self.app.run(lines=lines)
 
 
