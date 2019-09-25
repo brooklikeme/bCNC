@@ -914,7 +914,7 @@ class ProbeFrame(CNCRibbon.PageFrame):
 		lines = []
 		# temp
 		lines.append("%wait")
-		lines.append("g90 g0 z-95")
+		lines.append("g53 g0 z-95")
 		# temp end
 		lines.append("%wait")
 		lines.append("g91 g38.2 z" + zPos + " f[fastprbfeed]")
