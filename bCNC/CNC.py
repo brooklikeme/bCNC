@@ -4669,6 +4669,9 @@ class GCode:
 							skip = True	# skip whole line
 						elif CNC.toolPolicy >= 2:
 							expand = CNC.compile(self.cnc.toolChange())
+					# bypass M07
+					elif self.cnc.mval == 7:
+						skip = True
 					self.cnc.motionEnd()
 
 				if expand is not None:
