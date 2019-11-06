@@ -13,6 +13,7 @@ except ImportError:
 from time import sleep
 
 
+
 GPIO_STEP = 17   # Direction GPIO Pin
 GPIO_DIR = 27  # Step GPIO Pin
 GPIO_LIMIT = 22 # ATC Switch Pin
@@ -27,8 +28,15 @@ DEFAULT_DELAY = 0.001
 PREPARE_OFFSET = 4.3 # mm from init position
 EXEC_DISTANCE = 1
 
+ATC_UN_INIT = 0
+ATC_LOOSEING = 1
+ATC_CLAMPING = 2
+
 
 class ToolRack(object):
+
+    ATCStatus = ATC_UN_INIT
+
     def __init__(self):
         return
 
@@ -53,12 +61,23 @@ class ToolRack(object):
             self.ATCUp(DEFAULT_DELAY, SPM * 0.01) # atc up until limit switch is triggered
         # go down
         self.ATCDown(DEFAULT_DELAY, SPM * PREPARE_OFFSET)
+        self.ATCStatus = ATC_LOOSEING
 
     def execClampTool(self):
+        if self.ATCStatus == ATC_UN_INIT:
+            self.initATC()
+        elif self.ATCStatus == ATC_CLAMPING:
+            return
         print('execClampTool!')
         self.ATCUp(DEFAULT_DELAY, SPM * EXEC_DISTANCE)
+        self.ATCStatus = ATC_CLAMPING
 
     def execLooseTool(self):
+        if self.ATCStatus == ATC_UN_INIT:
+            self.initATC()
+        elif self.ATCStatus == ATC_LOOSEING:
+            return
         print('execLooseTool!')
         self.ATCDown(DEFAULT_DELAY, SPM * EXEC_DISTANCE)
+        self.ATCStatus = ATC_LOOSEING
 
