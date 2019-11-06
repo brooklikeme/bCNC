@@ -24,7 +24,7 @@ GPIO.setup(GPIO_DIR, GPIO.OUT) # GPIO Assign mode
 GPIO.setup(GPIO_LIMIT, GPIO.IN) # GPIO Assign mode
 
 DEFAULT_DELAY = 0.001
-PREPARE_OFFSET = 1 # mm from init position
+PREPARE_OFFSET = 4.3 # mm from init position
 EXEC_DISTANCE = 1
 
 
