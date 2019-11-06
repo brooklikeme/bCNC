@@ -10,31 +10,55 @@ try:
 except ImportError:
 	from fakerpi import GPIO as GPIO
 
-GPIO_TOOLRACK = 17
+from time import sleep
 
-GPIO_AIRPUMP  = 18
+
+GPIO_STEP = 11   # Direction GPIO Pin
+GPIO_DIR = 13  # Step GPIO Pin
+GPIO_LIMIT = 15 # ATC Switch Pin
+SPM = 518   # Steps per mm (200 * 5.18 / 2)
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(GPIO_TOOLRACK, GPIO.OUT, initial=GPIO.HIGH) # GPIO Assign mode
-GPIO.setup(GPIO_AIRPUMP, GPIO.OUT, initial=GPIO.HIGH) # GPIO Assign mode
+GPIO.setup(GPIO_STEP, GPIO.OUT) # GPIO Assign mode
+GPIO.setup(GPIO_DIR, GPIO.OUT) # GPIO Assign mode
+GPIO.setup(GPIO_LIMIT, GPIO.IN) # GPIO Assign mode
+
+DEFAULT_DELAY = 0.005
+PREPARE_OFFSET = 1 # mm from init position
+EXEC_DISTANCE = 0.1
+
 
 class ToolRack(object):
     def __init__(self):
         return
 
-    def enableToolRack(self):
-        print('Tool rack enabled!')
-        GPIO.output(GPIO_TOOLRACK, GPIO.LOW)
+    def execSteps(self, delay, steps):
+        steps = int(steps)
+        for x in range(steps):
+            GPIO.output(GPIO_STEP, GPIO.HIGH)
+            sleep(delay)
+            GPIO.output(GPIO_STEP, GPIO.LOW)
+            sleep(delay)
 
-    def disableToolRack(self):
-        print('Tool rack disabled!')
-        GPIO.output(GPIO_TOOLRACK, GPIO.HIGH)
+    def ATCUp(self, delay, steps):
+        GPIO.output(GPIO_DIR, 1)
+        self.execSteps(delay, steps)
 
-    def openAirPump(self):
-        print('AirPump opend!')
-        GPIO.output(GPIO_AIRPUMP, GPIO.LOW)
+    def ATCDown(self, delay, steps):
+        GPIO.output(GPIO_DIR, 0)
+        self.execSteps(delay, steps)
 
-    def closeAirPump(self):
-        print('AirPump closed!')
-        GPIO.output(GPIO_AIRPUMP, GPIO.HIGH)
+    def initATC(self):
+        while not GPIO.input(GPIO_LIMIT):
+            self.ATCUp(DEFAULT_DELAY, SPM / 10) # atc up until limit switch is triggered
+        # go down
+        self.ATCDown(DEFAULT_DELAY, SPM * PREPARE_OFFSET)
+
+    def execClampTool(self):
+        print('execClampTool!')
+        self.ATCUp(DEFAULT_DELAY, SPM * EXEC_DISTANCE)
+
+    def execLooseTool(self):
+        print('execLooseTool!')
+        self.ATCDown(DEFAULT_DELAY, SPM * EXEC_DISTANCE)
 

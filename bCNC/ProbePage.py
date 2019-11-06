@@ -2372,23 +2372,13 @@ class ATCFrame(CNCRibbon.PageFrame):
 
 		row += 1
 		col = 0
-		b = Button(lframe, text=_("Enable Tool Rack"),
-				   command=self.enableToolRack,
+		b = Button(lframe, text=_("Init ATC"),
+				   command=self.initTool,
 				   image=Utils.icons["empty"],
 				   compound="c",
 				   padx=2, pady=1, height=height)
-		b.grid(row=row, column=col, sticky=EW, columnspan=3)
-		tkExtra.Balloon.set(b, _("Enable Tool Rack"))
-		self.addWidget(b)
-
-		col += 3
-		b = Button(lframe, text=_("Disable Tool Rack"),
-				   command=self.disableToolRack,
-				   image=Utils.icons["empty"],
-				   compound="c",
-				   padx=2, pady=1, height=height)
-		b.grid(row=row, column=col, sticky=EW, columnspan=3)
-		tkExtra.Balloon.set(b, _("Disable Tool Rack"))
+		b.grid(row=row, column=col, sticky=EW, columnspan=6)
+		tkExtra.Balloon.set(b, _("Init ATC"))
 		self.addWidget(b)
 
 		lframe.grid_columnconfigure(1, weight=1)
@@ -2396,30 +2386,6 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lframe.grid_columnconfigure(3, weight=1)
 
 		self.selectedTool.set("1")
-
-
-	# -----------------------------------------------------------------------
-	def enableToolRack(self):
-		# record y machine position
-		CNC.vars["lastmy"] = CNC.vars["my"]
-		CNC.vars["lastwy"] = CNC.vars["wy"]
-
-		lines = []
-		lines.append("%enabletool")
-		lines.append("$H")
-		lines.append("%wait")
-		self.app.run(lines=lines)
-
-	# -----------------------------------------------------------------------
-	def disableToolRack(self):
-		CNC.vars["lastwy"] = 15
-		if "lastwy" not in CNC.vars:
-			return
-		lines = []
-		lines.append("%disabletool")
-		lines.append("g10l20p1y" + str(CNC.vars["lastwy"]))
-		lines.append("%wait")
-		self.app.run(lines=lines)
 
 	# -----------------------------------------------------------------------
 	def saveConfig(self):
@@ -2703,12 +2669,15 @@ class ATCFrame(CNCRibbon.PageFrame):
 
 	# -----------------------------------------------------------------------
 	def looseTool(self):
-		self.toolrack.openAirPump()
+		self.toolrack.execLooseTool()
 
 	# -----------------------------------------------------------------------
 	def clampTool(self):
-		self.toolrack.closeAirPump()
+		self.toolrack.execClampTool()
 
+	# -----------------------------------------------------------------------
+	def initTool(self):
+		self.toolrack.initATC()
 
 ##===============================================================================
 ## Help Frame

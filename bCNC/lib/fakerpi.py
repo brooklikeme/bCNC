@@ -12,15 +12,21 @@ class GPIO(object):
     OUT  = 1
     HIGH = 1
     LOW  = 0
+    IN = 2
 
     @staticmethod
     def setmode(mode):
         print 'fake set mode!'
 
     @staticmethod
-    def setup(port, mode, initial):
+    def setup(port, mode):
         print 'fake setup!'
 
     @staticmethod
     def output(port, ttl):
         print 'fake output'
+
+    @staticmethod
+    def input(port):
+        print 'fake input'
+        return 1

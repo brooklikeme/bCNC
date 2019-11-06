@@ -811,25 +811,13 @@ class Sender:
 					tg = t
 
 	# -----------------------------------------------------------------------
-	def enableTool(self):
-		# enable tool rack
-		self.toolrack.enableToolRack()
-		time.sleep(1)
-
-	# -----------------------------------------------------------------------
-	def disableTool(self):
-		# disable tool rack
-		self.toolrack.disableToolRack()
-		time.sleep(1)
-
-	# -----------------------------------------------------------------------
 	def looseTool(self):
 		# enable tool rack
-		self.toolrack.openAirPump()
+		self.toolrack.execLooseTool()
 		time.sleep(1)
 
 	# -----------------------------------------------------------------------
 	def clampTool(self):
 		# disable tool rack
-		self.toolrack.closeAirPump()
+		self.toolrack.execClampTool()
 		time.sleep(1)
