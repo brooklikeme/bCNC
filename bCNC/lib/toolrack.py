@@ -13,9 +13,9 @@ except ImportError:
 from time import sleep
 
 
-GPIO_STEP = 11   # Direction GPIO Pin
-GPIO_DIR = 13  # Step GPIO Pin
-GPIO_LIMIT = 15 # ATC Switch Pin
+GPIO_STEP = 17   # Direction GPIO Pin
+GPIO_DIR = 27  # Step GPIO Pin
+GPIO_LIMIT = 22 # ATC Switch Pin
 SPM = 518   # Steps per mm (200 * 5.18 / 2)
 
 GPIO.setmode(GPIO.BCM)
