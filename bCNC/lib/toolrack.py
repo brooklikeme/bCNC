@@ -49,15 +49,10 @@ class ToolRack(object):
         self.execSteps(delay, steps)
 
     def initATC(self):
-        if GPIO.input(GPIO_LIMIT):
-            print('triggered!')
-        else:
-            print('not triggered!')
-        return
-        #while not GPIO.input(GPIO_LIMIT):
-        #    self.ATCUp(DEFAULT_DELAY, SPM / 10) # atc up until limit switch is triggered
+        while GPIO.input(GPIO_LIMIT):
+            self.ATCUp(DEFAULT_DELAY, SPM * 0.01) # atc up until limit switch is triggered
         # go down
-        #self.ATCDown(DEFAULT_DELAY, SPM * PREPARE_OFFSET)
+        self.ATCDown(DEFAULT_DELAY, SPM * PREPARE_OFFSET)
 
     def execClampTool(self):
         print('execClampTool!')
