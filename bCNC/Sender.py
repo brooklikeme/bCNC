@@ -814,10 +814,10 @@ class Sender:
 	def looseTool(self):
 		# enable tool rack
 		self.toolrack.execLooseTool()
-		time.sleep(1)
+		time.sleep(0.5)
 
 	# -----------------------------------------------------------------------
 	def clampTool(self):
 		# disable tool rack
 		self.toolrack.execClampTool()
-		time.sleep(1)
+		time.sleep(0.5)

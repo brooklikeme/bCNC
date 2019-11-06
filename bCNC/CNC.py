@@ -1714,13 +1714,13 @@ class CNC:
 		lines.append("%_x,_y,_z = wx,wy,wz")	# remember position
 		lines.append("%%msg Tool change T%02d" % (self.tool))
 
-		lines.append("%enabletool")	# enable toolrack
-		lines.append("g53 g0 z[initoffset]") # speed up
-		lines.append("g53 g0 x[initoffset]")  # speed up
-
-		lines.append("%wait")
-		lines.append("$H")  # Homing
-		lines.append("%wait") # wait for end of homing
+		# lines.append("%enabletool")	# enable toolrack
+		# lines.append("g53 g0 z[initoffset]") # speed up
+		# lines.append("g53 g0 x[initoffset]")  # speed up
+		#
+		# lines.append("%wait")
+		# lines.append("$H")  # Homing
+		# lines.append("%wait") # wait for end of homing
 
 		if CNC.vars["lasttool"] != 0:
 			# drop tool first
@@ -1774,16 +1774,16 @@ class CNC:
 		lines.append("g90")
 
 		# disable
-		lines.append("%wait")
-		lines.append("$H")  # Homing
-		lines.append("%wait") # wait for end of homing
-		lines.append("%disabletool")
-		lines.append("g10l20p1y[_y]")
-		lines.append("%wait")
+		# lines.append("%wait")
+		# lines.append("$H")  # Homing
+		# lines.append("%wait") # wait for end of homing
+		# lines.append("%disabletool")
+		# lines.append("g10l20p1y[_y]")
+		# lines.append("%wait")
 
 		# restore state
 		lines.append("g90")		# restore mode
-		lines.append("g0 x[_x]")	# restore x position
+		lines.append("g0 x[_x] y[_y]")	# restore x and y position
 		lines.append("g0 z[_z]")	# restore z position
 		lines.append("%wait")
 		lines.append("f[feed] [spindle]")# ... feed and spindle
