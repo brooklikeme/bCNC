@@ -61,7 +61,7 @@ class ToolRack(object):
             self.ATCUp(DEFAULT_DELAY, SPM * 0.01) # atc up until limit switch is triggered
         # go down
         self.ATCDown(DEFAULT_DELAY, SPM * PREPARE_OFFSET)
-        self.ATCStatus = ATC_LOOSEING
+        self.ATCStatus = ATC_CLAMPING
 
     def execClampTool(self):
         if self.ATCStatus == ATC_UN_INIT:
