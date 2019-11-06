@@ -25,7 +25,7 @@ GPIO.setup(GPIO_LIMIT, GPIO.IN) # GPIO Assign mode
 
 DEFAULT_DELAY = 0.005
 PREPARE_OFFSET = 1 # mm from init position
-EXEC_DISTANCE = 0.1
+EXEC_DISTANCE = 1
 
 
 class ToolRack(object):
