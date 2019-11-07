@@ -1734,15 +1734,15 @@ class CNC:
 			lines.append("%wait")
 			lines.append("g53 g0 z[toolheight]")
 			lines.append("%wait")
-			lines.append("%clamptool")
-			lines.append("%wait")
 			lines.append("g90")
 
 		# mount new tool
 		lines.append("g53 g0 z[toolheight]")
 		lines.append("g53 g0 x[tool" + str(self.tool) + "x] y[tool" + str(self.tool) + "y]")
-		lines.append("%wait")
-		lines.append("%loosetool")
+		if CNC.vars["lasttool"] == 0:
+			lines.append("%wait")
+			lines.append("%loosetool")
+
 		lines.append("%wait")
 		lines.append("g53 g0 z[tool" + str(self.tool) + "z + tooldistance]")
 		lines.append("%wait")
