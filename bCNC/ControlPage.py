@@ -504,6 +504,7 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 				background=Sender.STATECOLOR[Sender.NOT_CONNECTED],
 				activebackground="LightYellow")
 		self.state.grid(row=row,column=col, columnspan=4, sticky=EW)
+
 		tkExtra.Balloon.set(self.state,
 				_("Show current state of the machine\n"
 				  "Click to see details\n"
@@ -552,7 +553,7 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 					relief=FLAT,
 					borderwidth=0,
 					justify=RIGHT,)
-		self.zwork.grid(row=row,column=col,padx=1,sticky=EW)
+		self.awork.grid(row=row,column=col,padx=1,sticky=EW)
 		tkExtra.Balloon.set(self.awork, _("A work position (click to set)"))
 
 		# Machine
