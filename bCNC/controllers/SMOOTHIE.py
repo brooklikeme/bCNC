@@ -61,9 +61,11 @@ class Controller(_GenericController):
 		CNC.vars["wx"] = float(d['WPos'][0])
 		CNC.vars["wy"] = float(d['WPos'][1])
 		CNC.vars["wz"] = float(d['WPos'][2])
+		CNC.vars["wa"] = 0.0
 		CNC.vars["wcox"] = CNC.vars["mx"] - CNC.vars["wx"]
 		CNC.vars["wcoy"] = CNC.vars["my"] - CNC.vars["wy"]
 		CNC.vars["wcoz"] = CNC.vars["mz"] - CNC.vars["wz"]
+		CNC.vars["wcoa"] = CNC.vars["mz"] - CNC.vars["wz"]
 		if 'F' in d:
 		        CNC.vars["curfeed"] = float(d['F'][0])
 		self.master._posUpdate = True
