@@ -128,7 +128,7 @@ class RunGroup(CNCRibbon.ButtonGroup):
 				image=Utils.icons["start32"],
 				text=_("Start"),
 				compound=TOP,
-				width=60,
+				width=40,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Run g-code commands from editor to controller"))
@@ -138,7 +138,7 @@ class RunGroup(CNCRibbon.ButtonGroup):
 				image=Utils.icons["pause32"],
 				text=_("Pause"),
 				compound=TOP,
-				width=60,
+				width=40,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Pause running program. Sends either FEED_HOLD ! or CYCLE_START ~"))
@@ -147,7 +147,7 @@ class RunGroup(CNCRibbon.ButtonGroup):
 				image=Utils.icons["stop32"],
 				text=_("Stop"),
 				compound=TOP,
-				width=60,
+				width=40,
 				background=Ribbon._BACKGROUND)
 		b.pack(side=LEFT, fill=BOTH)
 		tkExtra.Balloon.set(b, _("Pause running program and soft reset controller to empty the buffer."))

@@ -2220,7 +2220,7 @@ class ATCFrame(CNCRibbon.PageFrame):
 		lframe = LabelFrame(self, text=_("Auto Tool Change"), foreground="DarkBlue")
 		lframe.pack(side=TOP, fill=X)
 
-		width = 55
+		width = 40
 		height = 25
 		# ------
 		row, col = 0, 1
