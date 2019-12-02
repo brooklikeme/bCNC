@@ -277,6 +277,15 @@ class DROFrame(CNCRibbon.PageFrame):
 		tkExtra.Balloon.set(self.zzero, _("Set Z coordinate to zero (or to typed coordinate in WPos)"))
 		self.addWidget(self.zzero)
 
+		col += 1
+		self.azero = Button(self, text=_("A=0"),
+				command=self.setA0,
+				activebackground="LightYellow",
+				padx=2, pady=1)
+		self.azero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.azero, _("Set A coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.azero)
+
 		# Set buttons
 		row += 1
 		col = 1
@@ -400,6 +409,10 @@ class DROFrame(CNCRibbon.PageFrame):
 		self._wcsSet(None,None,"0")
 
 	#----------------------------------------------------------------------
+	def setA0(self, event=None):
+		self._wcsSet(None,None,"0")
+
+	#----------------------------------------------------------------------
 	def setXY0(self, event=None):
 		self._wcsSet("0","0",None)
 
@@ -435,8 +448,8 @@ class DROFrame(CNCRibbon.PageFrame):
 			pass
 
 	#----------------------------------------------------------------------
-	def wcsSet(self, x, y, z):
-		self._wcsSet(x, y, z)
+	def wcsSet(self, x, y, z, a):
+		self._wcsSet(x, y, z, a)
 
 	#----------------------------------------------------------------------
 	def _wcsSet(self, x, y, z):
@@ -455,6 +468,7 @@ class DROFrame(CNCRibbon.PageFrame):
 		if x is not None: pos += "X"+str(x)
 		if y is not None: pos += "Y"+str(y)
 		if z is not None: pos += "Z"+str(z)
+		if a is not None: pos += "A"+str(a)
 		cmd += pos
 		self.sendGCode(cmd)
 		self.sendGCode("$#")
@@ -941,9 +955,21 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		tkExtra.Balloon.set(self.zzero, _("Set Z coordinate to zero (or to typed coordinate in WPos)"))
 		self.addWidget(self.zzero)
 
+		col += 1
+		self.azero = Button(frame2, text=_("A=0"),
+				command=self.setA0,
+				image=Utils.icons["origin"],
+				height=20,
+				compound=LEFT,
+				activebackground="LightYellow")
+		self.azero.grid(row=row, column=col, pady=0, sticky=EW)
+		tkExtra.Balloon.set(self.azero, _("Set A coordinate to zero (or to typed coordinate in WPos)"))
+		self.addWidget(self.azero)
+
 		frame2.grid_columnconfigure(0, weight=1)
 		frame2.grid_columnconfigure(1, weight=1)
 		frame2.grid_columnconfigure(2, weight=1)
+		frame2.grid_columnconfigure(3, weight=1)
 
 
 
@@ -955,18 +981,22 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 			pass
 	#----------------------------------------------------------------------
 	def setX0(self, event=None):
-		self._wcsSet("0",None,None)
+		self._wcsSet("0",None,None,None)
 
 	#----------------------------------------------------------------------
 	def setY0(self, event=None):
-		self._wcsSet(None,"0",None)
+		self._wcsSet(None,"0",None,None)
 
 	#----------------------------------------------------------------------
 	def setZ0(self, event=None):
-		self._wcsSet(None,None,"0")
+		self._wcsSet(None,None,"0",None)
 
 	#----------------------------------------------------------------------
-	def _wcsSet(self, x, y, z):
+	def setA0(self, event=None):
+		self._wcsSet(None,None,None,"0")
+
+	#----------------------------------------------------------------------
+	def _wcsSet(self, x, y, z, a):
 		global wcsvar
 		p = wcsvar.get()
 		if p<6:
@@ -982,6 +1012,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		if x is not None: pos += "X"+str(x)
 		if y is not None: pos += "Y"+str(y)
 		if z is not None: pos += "Z"+str(z)
+		if a is not None: pos += "A" + str(a)
 		cmd += pos
 		self.sendGCode(cmd)
 		self.sendGCode("$#")
@@ -1006,6 +1037,9 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 				return self.selectedStep.get()
 			else:
 				return zs
+		elif axis == 'a':
+			_as = self.selectedAStep.get()
+			return _as
 		else:
 			return self.selectedStep.get()
 
