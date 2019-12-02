@@ -255,13 +255,13 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		# b.grid(row=row,column=col,sticky=E)
 		# self.addWidget(b)
 
-		b = Button(frame1, text=_("Port:"),
+		self.portBtn = Button(frame1, text=_("Port(G):"),
 					command=lambda s=self : s.comportRefresh(True),
 				    image=Utils.icons["empty"],
 				    compound="c",
 					activebackground="LightYellow")
-		b.grid(row=row, column=col, sticky=E)
-		self.addWidget(b)
+		self.portBtn.grid(row=row, column=col, sticky=E)
+		self.addWidget(self.portBtn)
 
 		col += 1
 		self.selectedPort = StringVar()
@@ -517,6 +517,15 @@ class SerialFrame(CNCRibbon.PageLabelFrame):
 		menu.delete(0, "end")
 		for string in devices_clean:
 			menu.add_command(label=string, command=lambda value=string: self.selectedPort.set(value))
+
+		# update name
+		if self.portBtn["text"] == "Port:(S)":
+			self.portBtn["text"] = "Port:(G)"
+			self.app.controllerSet("GRBL1")
+		else:
+			self.portBtn["text"] = "Port:(S)"
+			self.app.controllerSet("SMOOTHIE")
+
 
 	#-----------------------------------------------------------------------
 	def saveConfig(self):

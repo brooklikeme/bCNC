@@ -503,7 +503,7 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 				cursor="hand1",
 				background=Sender.STATECOLOR[Sender.NOT_CONNECTED],
 				activebackground="LightYellow")
-		self.state.grid(row=row,column=col, columnspan=3, sticky=EW)
+		self.state.grid(row=row,column=col, columnspan=4, sticky=EW)
 		tkExtra.Balloon.set(self.state,
 				_("Show current state of the machine\n"
 				  "Click to see details\n"
@@ -545,6 +545,16 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 		self.zwork.grid(row=row,column=col,padx=1,sticky=EW)
 		tkExtra.Balloon.set(self.zwork, _("Z work position (click to set)"))
 
+		# ---
+		col += 1
+		self.awork = Entry(self, font=TopDROFrame.dro_wpos,
+					background="White",
+					relief=FLAT,
+					borderwidth=0,
+					justify=RIGHT,)
+		self.zwork.grid(row=row,column=col,padx=1,sticky=EW)
+		tkExtra.Balloon.set(self.awork, _("A work position (click to set)"))
+
 		# Machine
 		row += 1
 		col = 0
@@ -562,9 +572,14 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 		self.zmachine = Label(self, font=TopDROFrame.dro_mpos, background="White", anchor=E)
 		self.zmachine.grid(row=row,column=col,padx=1,sticky=EW)
 
+		col += 1
+		self.amachine = Label(self, font=TopDROFrame.dro_mpos, background="White", anchor=E)
+		self.amachine.grid(row=row,column=col,padx=1,sticky=EW)
+
 		self.grid_columnconfigure(1, weight=1)
 		self.grid_columnconfigure(2, weight=1)
 		self.grid_columnconfigure(3, weight=1)
+		self.grid_columnconfigure(4, weight=1)
 
 	#----------------------------------------------------------------------
 	def stateMenu(self, event=None):
@@ -605,10 +620,14 @@ class TopDROFrame(Frame, CNCRibbon._LinkApp):
 		if focus is not self.zwork:
 			self.zwork.delete(0,END)
 			self.zwork.insert(0,self.padFloat(CNC.drozeropad,CNC.vars["wz"]))
+		if focus is not self.awork:
+			self.awork.delete(0,END)
+			self.awork.insert(0,self.padFloat(CNC.drozeropad,CNC.vars["wa"]))
 
 		self.xmachine["text"] = self.padFloat(CNC.drozeropad,CNC.vars["mx"])
 		self.ymachine["text"] = self.padFloat(CNC.drozeropad,CNC.vars["my"])
 		self.zmachine["text"] = self.padFloat(CNC.drozeropad,CNC.vars["mz"])
+		self.amachine["text"] = self.padFloat(CNC.drozeropad,CNC.vars["ma"])
 
 	#----------------------------------------------------------------------
 	def padFloat(self, decimals, value):
@@ -697,6 +716,18 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		tkExtra.Balloon.set(b, _("Move +Z"))
 		self.addWidget(b)
 
+		col += 1
+		b = Button(frame, text="A+",
+					command=self.moveAup,
+				    image=Utils.icons["empty"],
+					height=height,
+				   font=_BUTTONFONT,
+				    compound="c",
+					activebackground="LightYellow")
+		b.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(b, _("Move +A"))
+		self.addWidget(b)
+
 		# ---------------------------------------------
 		row += 1
 
@@ -748,6 +779,15 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		self.zstep.grid(row=row, column=col, sticky=EW)
 		tkExtra.Balloon.set(self.zstep, _("Step for Z move operation"))
 		self.addWidget(self.zstep)
+
+		col += 1
+		self.selectedAStep = StringVar()
+		self.selectedAStep.set(Utils.config.get("Control", "astep"))
+		self.astep = OptionMenu(frame, self.selectedAStep, *(Utils.config.get("Control", "asteplist").split()))
+		self.astep.config(padx=0, pady=1, width=5)
+		self.astep.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(self.astep, _("Step for A move operation"))
+		self.addWidget(self.astep)
 
 
 		# self.step = tkExtra.Combobox(frame, width=6, background="White")
@@ -843,11 +883,24 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 		tkExtra.Balloon.set(b, _("Move -Z"))
 		self.addWidget(b)
 
+		col += 1
+		b = Button(frame, text="A-",
+					command=self.moveAdown,
+				    image=Utils.icons["empty"],
+				    height=height,
+				    compound="c",
+				   font=_BUTTONFONT,
+					activebackground="LightYellow")
+		b.grid(row=row, column=col, sticky=EW)
+		tkExtra.Balloon.set(b, _("Move -A"))
+		self.addWidget(b)
+
 		frame.grid_columnconfigure(0, weight=1)
 		frame.grid_columnconfigure(1, weight=1)
 		frame.grid_columnconfigure(2, weight=1)
 		frame.grid_columnconfigure(3, weight=1)
 		frame.grid_columnconfigure(4, weight=1)
+		frame.grid_columnconfigure(5, weight=1)
 
 		#--------------------------------------------------------
 		frame2 = Frame(self())
@@ -994,6 +1047,14 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
 	def moveZdown(self, event=None):
 		if event is not None and not self.acceptKey(): return
 		self.app.mcontrol.jog("Z-%s"%(self.getStep('z')))
+
+	def moveAup(self, event=None):
+		if event is not None and not self.acceptKey(): return
+		self.app.mcontrol.jog("A%s" % (self.getStep('a')))
+
+	def moveAdown(self, event=None):
+		if event is not None and not self.acceptKey(): return
+		self.app.mcontrol.jog("A-%s" % (self.getStep('a')))
 
 	def go2origin(self, event=None):
 		self.sendGCode("G90")

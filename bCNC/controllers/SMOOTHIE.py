@@ -57,6 +57,7 @@ class Controller(_GenericController):
 		CNC.vars["mx"] = float(d['MPos'][0])
 		CNC.vars["my"] = float(d['MPos'][1])
 		CNC.vars["mz"] = float(d['MPos'][2])
+		CNC.vars["ma"] = float(d['MPos'][3])
 		CNC.vars["wx"] = float(d['WPos'][0])
 		CNC.vars["wy"] = float(d['WPos'][1])
 		CNC.vars["wz"] = float(d['WPos'][2])

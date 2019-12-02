@@ -95,7 +95,7 @@ class Sender:
 		#self.mcontrol     = None
 		self.controllers = {}
 		self.controllerLoad()
-		self.controllerSet("GRBL1")
+		self.controllerSet("SMOOTHIE")
 
 		CNC.loadConfig(Utils.config)
 		self.gcode = GCode()
